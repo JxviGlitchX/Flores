@@ -25,6 +25,7 @@
             --text-sub: #d1c4e9;
             --astro-glow: rgba(255, 255, 255, 0.4);
             --ambient-light: rgba(138, 180, 248, 0.1);
+            --tree-color: #041404;
         }
 
         body.day-mode {
@@ -38,6 +39,7 @@
             --text-sub: #7f8c8d;
             --astro-glow: rgba(241, 196, 15, 0.6);
             --ambient-light: rgba(255, 255, 255, 0.3);
+            --tree-color: #1a5c1a;
         }
 
         * {
@@ -62,7 +64,7 @@
             width: 100%;
             height: 120%;
             z-index: 1;
-            transition: opacity var(--transition-speed) ease, transform 0.1s ease-out;
+            transition: opacity var(--transition-speed) ease;
             animation: moveSky 80s linear infinite;
         }
 
@@ -112,7 +114,8 @@
             height: clamp(50px, 12vw, 110px);
             border-radius: 50%;
             z-index: 2;
-            transition: all var(--transition-speed) ease, transform 0.1s ease-out;
+            transition: background var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+            overflow: hidden;
         }
 
         body.night-mode .celestial-body {
@@ -125,6 +128,21 @@
             box-shadow: 0 0 50px var(--astro-glow), 0 0 100px var(--astro-glow);
         }
 
+        .crater {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.08);
+            transition: opacity var(--transition-speed) ease;
+        }
+
+        body.day-mode .crater {
+            opacity: 0;
+        }
+
+        body.night-mode .crater {
+            opacity: 1;
+        }
+
         .clouds-container {
             position: absolute;
             top: 10vh;
@@ -132,7 +150,7 @@
             height: 100px;
             z-index: 2;
             animation: moveClouds 60s linear infinite;
-            transition: opacity var(--transition-speed) ease, transform 0.1s ease-out;
+            transition: opacity var(--transition-speed) ease;
         }
 
         body.night-mode .clouds-container {
@@ -208,6 +226,25 @@
             to {
                 transform: translateX(-50%);
             }
+        }
+
+        /* 🌳 Silueta de árboles */
+        .tree-silhouettes {
+            position: absolute;
+            bottom: 28vh;
+            left: -8%;
+            width: 116%;
+            height: 16vh;
+            z-index: 4;
+            pointer-events: none;
+            color: var(--tree-color);
+            transition: color var(--transition-speed) ease;
+        }
+
+        .tree-silhouettes svg {
+            width: 100%;
+            height: 100%;
+            display: block;
         }
 
         .ground-layer {
@@ -310,7 +347,6 @@
             transform-origin: bottom center;
             cursor: pointer;
             pointer-events: all;
-            touch-action: manipulation;
             animation: sway var(--sway-time, 4s) ease-in-out infinite alternate,
                 growIn 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
             animation-delay: var(--delay, 0s), var(--delay, 0s);
@@ -435,42 +471,27 @@
             pointer-events: none;
         }
 
-        #sound-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 100;
-            width: 44px;
-            height: 44px;
+        /* ✨ Estela mágica del cursor */
+        .cursor-trail {
+            position: fixed;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
-            background: rgba(0, 0, 0, 0.35);
-            backdrop-filter: blur(8px);
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.3s;
+            pointer-events: none;
+            z-index: 100;
+            animation: trailFade 0.7s ease-out forwards;
         }
 
-        #sound-toggle:hover {
-            background: rgba(0, 0, 0, 0.5);
-        }
+        @keyframes trailFade {
+            0% {
+                transform: scale(1);
+                opacity: 0.85;
+            }
 
-        #sound-toggle svg {
-            width: 24px;
-            height: 24px;
-            fill: #fff;
-        }
-
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
-            clip: rect(0 0 0 0);
-            white-space: nowrap;
-            border: 0;
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
         }
 
         @media (max-width: 600px) {
@@ -502,867 +523,637 @@
 </head>
 
 <body class="night-mode">
-
-    <div id="announcer" class="sr-only" aria-live="assertive"></div>
-
-    <button id="sound-toggle" aria-label="Activar sonido" title="Sonido">
-        <svg id="sound-icon-on" viewBox="0 0 24 24">
-            <path
-                d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
-        </svg>
-        <svg id="sound-icon-off" viewBox="0 0 24 24" style="display:none">
-            <path
-                d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
-        </svg>
-    </button>
-
     <div class="stars-container" id="stars"></div>
-    <div class="celestial-body"></div>
-    <div class="clouds-container">
+    <div class="celestial-body" id="celestial"></div>
+    <div class="clouds-container" id="clouds">
         <div class="cloud cloud-1"></div>
         <div class="cloud cloud-2"></div>
     </div>
     <div class="ambient-glow"></div>
-    <div class="ground-layer ground-back"></div>
-    <div class="ground-layer ground-mid"></div>
-    <div class="ground-layer ground-front"></div>
+    <div class="tree-silhouettes" id="tree-silhouettes"></div>
+    <div class="ground-layer ground-back" id="ground-back"></div>
+    <div class="ground-layer ground-mid" id="ground-mid"></div>
+    <div class="ground-layer ground-front" id="ground-front"></div>
     <div class="mensaje-container">
-        <h1 class="titulo-principal" id="title-dynamic" aria-live="polite">Cargando...</h1>
-        <div class="subtitulo" id="sub-dynamic" aria-live="polite"></div>
+        <h1 class="titulo-principal" id="title-dynamic">Cargando...</h1>
+        <div class="subtitulo" id="sub-dynamic"></div>
     </div>
-    <div id="garden-container" aria-hidden="true"></div>
-    <canvas id="particles-canvas" aria-hidden="true"></canvas>
+    <div id="garden-container"></div>
+    <canvas id="particles-canvas"></canvas>
 
     <script>
-        (function () {
-            // ═══ Referencias DOM ═══
+        // ─── TEXTO DINÁMICO ─────────────────────────────────────────────────────────
+        function updateDynamicTitle() {
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const hourNow = new Date().getHours();
+            const isNightText = hourNow >= 19 || hourNow < 6;
+            const day1 = new Date(2026, 4, 4);
+            const endDate = new Date(2026, 7, 31);
             const titleEl = document.getElementById('title-dynamic');
             const subEl = document.getElementById('sub-dynamic');
-            const announcer = document.getElementById('announcer');
-            const garden = document.getElementById('garden-container');
-            const canvas = document.getElementById('particles-canvas');
-            const ctx = canvas.getContext('2d');
-            const starsContainer = document.getElementById('stars');
-            const celestialBody = document.querySelector('.celestial-body');
-            const cloudsContainer = document.querySelector('.clouds-container');
-            const soundToggle = document.getElementById('sound-toggle');
-            const soundIconOn = document.getElementById('sound-icon-on');
-            const soundIconOff = document.getElementById('sound-icon-off');
+            if (today < day1) { titleEl.innerHTML = "Preparando estadias..."; subEl.textContent = "Falta muy poco"; return; }
+            if (today > endDate) { titleEl.innerHTML = "¡Felices estadias!"; subEl.textContent = "Fue un gran camino"; return; }
+            if (isNightText) {
+                titleEl.innerHTML = "Espero que te haya sido<br>de maravilla en tu estadía";
+                subEl.textContent = "Descansa niña 💤"; return;
+            }
+            let targetDate = new Date(today); const dow = targetDate.getDay(); let isWeekend = false;
+            if (dow === 6) { targetDate.setDate(targetDate.getDate() - 1); isWeekend = true; }
+            else if (dow === 0) { targetDate.setDate(targetDate.getDate() - 2); isWeekend = true; }
+            let count = 0; let temp = new Date(day1);
+            while (temp <= targetDate) { if (temp.getDay() !== 0 && temp.getDay() !== 6) count++; temp.setDate(temp.getDate() + 1); }
+            let suffix = "to"; if (count === 1) suffix = "er"; else if (count === 2) suffix = "do"; else if (count === 3) suffix = "er";
+            titleEl.innerHTML = `Feliz ${count}${suffix} día<br>de estadias`;
+            subEl.textContent = isWeekend ? "Disfruta tu fin de semana" : "Que te vaya super bien";
+        }
+        updateDynamicTitle();
 
-            // ═══ Estado global ═══
-            let isNightMode = true;
-            let creatures = [];
-            let shootingStars; // Se asignará después de definir la clase ShootingStar
-            let shootingStarTimeout;
-            let animFrameId;
-            let isPageVisible = true;
-            let soundEnabled = true;
-            let audioCtx = null;
-            let ambientOsc = null;
-            let ambientGain = null;
+        // ─── TEMA DÍA/NOCHE ─────────────────────────────────────────────────────────
+        function setTheme() {
+            const h = new Date().getHours();
+            const n = h >= 19 || h < 6;
+            document.body.className = n ? 'night-mode' : 'day-mode';
+            return n;
+        }
+        let isNightMode = setTheme();
 
-            // ═══ Utilidades ═══
-            const STEMS = ['#388E3C', '#2E7D32', '#33691E'];
-            const LEAVES = ['#43A047', '#33691E', '#2E7D32', '#558B2F'];
-            const sparkleColors = ['#ffeb3b', '#ff4081', '#4caf50', '#00e5ff', '#ffffff', '#ff9800', '#ce93d8', '#80deea'];
-            const loveMessages = [
-                "Qué hermosa te quiero ❤️", "Eres la mejor 🌹", "Me encantan tus ojos",
-                "Tus ojos brillan más que las estrellas ✨", "Me pierdo en tu mirada",
-                "Tu pelo está increíble 💇‍♀️", "Me encanta tu cabello", "Tu sonrisa me alegra el día",
-                "Me haces muy feliz", "Eres especial para mí", "Contigo todo es mejor",
-                "Qué suerte tenerte", "Me encantas mucho", "Eres luz en mi día 🌸",
-                "Eres mi persona favorita", "Te pienso todo el día",
-                "Eres un sueño hecho realidad", "Eres única y especial",
-                "Contigo todo es mágico", "Eres la mejor compañía 🌺"
+        // ─── ESTRELLAS ───────────────────────────────────────────────────────────────
+        (function generateStars() {
+            const c = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const s = document.createElement('div'); s.className = 'star';
+                s.style.left = Math.random() * 100 + '%'; s.style.top = Math.random() * 85 + '%';
+                const z = Math.random() * 3 + 1; s.style.width = z + 'px'; s.style.height = z + 'px';
+                s.style.animationDelay = Math.random() * 3 + 's'; c.appendChild(s);
+            }
+        })();
+
+        // ─── 🌙 LUNA CON CRÁTERES ───────────────────────────────────────────────────
+        (function addCraters() {
+            const el = document.getElementById('celestial');
+            const craters = [
+                { x: '28%', y: '32%', s: '20%' }, { x: '56%', y: '22%', s: '13%' }, { x: '62%', y: '56%', s: '24%' },
+                { x: '36%', y: '64%', s: '10%' }, { x: '44%', y: '42%', s: '8%' }, { x: '70%', y: '38%', s: '11%' }
             ];
-            const lastMessages = [];
+            craters.forEach(c => {
+                const d = document.createElement('div'); d.className = 'crater';
+                d.style.left = c.x; d.style.top = c.y; d.style.width = c.s; d.style.height = c.s;
+                d.style.transform = 'translate(-50%,-50%)'; el.appendChild(d);
+            });
+        })();
 
-            function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        // ─── 🌳 SILUETA DE ÁRBOLES ──────────────────────────────────────────────────
+        (function generateTrees() {
+            const container = document.getElementById('tree-silhouettes');
+            const vw = Math.max(window.innerWidth * 1.16, 1400);
+            const vh = 160;
+            const ns = 'http://www.w3.org/2000/svg';
+            const svg = document.createElementNS(ns, 'svg');
+            svg.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
+            svg.setAttribute('preserveAspectRatio', 'none');
 
-            function getUniqueMessage() {
-                const available = loveMessages.filter(m => !lastMessages.includes(m));
-                if (available.length === 0) {
-                    lastMessages.length = 0;
-                    return rnd(loveMessages);
+            // Dos capas de árboles para profundidad
+            [0.85, 1].forEach((scale, layerIdx) => {
+                const offsetY = layerIdx * 18;
+                let d = `M -20 ${vh}`;
+                let x = -20;
+                while (x < vw + 40) {
+                    const tw = Math.random() * 38 + 22;
+                    const th = (Math.random() * vh * 0.5 + vh * 0.35) * scale;
+                    const baseY = vh - offsetY - Math.random() * 10;
+                    const midX = x + tw * 0.5;
+                    d += ` C ${x + tw * 0.08} ${baseY}, ${midX - tw * 0.12} ${baseY - th}, ${midX} ${baseY - th}`;
+                    d += ` C ${midX + tw * 0.12} ${baseY - th}, ${x + tw * 0.92} ${baseY}, ${x + tw} ${baseY + Math.random() * 8}`;
+                    x += tw + Math.random() * 6;
                 }
-                const msg = rnd(available);
-                lastMessages.push(msg);
-                if (lastMessages.length > 5) lastMessages.shift();
-                return msg;
-            }
+                d += ` L ${vw + 40} ${vh} Z`;
+                const path = document.createElementNS(ns, 'path');
+                path.setAttribute('d', d);
+                path.setAttribute('fill', 'currentColor');
+                if (layerIdx === 0) path.style.opacity = '0.6';
+                svg.appendChild(path);
+            });
+            container.appendChild(svg);
+        })();
 
-            // ═══ Sonido ═══
-            function initAudio() {
-                if (audioCtx) return;
-                try {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                } catch (e) {
-                    soundEnabled = false;
-                    updateSoundIcon();
-                    return;
-                }
-                const masterGain = audioCtx.createGain();
-                masterGain.gain.value = 0.25;
-                masterGain.connect(audioCtx.destination);
-                window._masterGain = masterGain;
-                startAmbient();
-            }
+        // ─── 🖱️ POSICIÓN DEL MOUSE (para parallax + luciérnagas) ────────────────────
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-            function playPopSound() {
-                if (!soundEnabled || !audioCtx) return;
-                const now = audioCtx.currentTime;
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, now);
-                osc.frequency.exponentialRampToValueAtTime(400, now + 0.15);
-                gain.gain.setValueAtTime(0.12, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
-                osc.connect(gain);
-                gain.connect(window._masterGain || audioCtx.destination);
-                osc.start(now);
-                osc.stop(now + 0.2);
-            }
+        if (!isTouchDevice) {
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
 
-            function startAmbient() {
-                if (!audioCtx || !soundEnabled) return;
-                stopAmbient();
-                const now = audioCtx.currentTime;
-                const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0, now);
-                gain.gain.linearRampToValueAtTime(0.03, now + 1);
-                ambientGain = gain;
+                // Parallax sutil
+                const cx = window.innerWidth / 2;
+                const dx = (e.clientX - cx) / cx; // -1 a 1
+                document.getElementById('stars').style.marginLeft = `${dx * -18}px`;
+                document.getElementById('clouds').style.marginLeft = `${dx * -22}px`;
+                document.getElementById('celestial').style.transform = `translateX(${dx * -10}px)`;
+                document.getElementById('tree-silhouettes').style.transform = `translateX(${dx * -12}px)`;
+                document.getElementById('ground-back').style.transform = `translateX(${dx * -7}px)`;
+                document.getElementById('ground-mid').style.transform = `translateX(${dx * -4}px)`;
 
-                if (isNightMode) {
-                    const bufferSize = 4096;
-                    const noise = audioCtx.createScriptProcessor(bufferSize, 1, 1);
-                    noise.onaudioprocess = function (e) {
-                        const output = e.outputBuffer.getChannelData(0);
-                        let lastOut = 0;
-                        for (let i = 0; i < bufferSize; i++) {
-                            const white = Math.random() * 2 - 1;
-                            output[i] = (lastOut + (0.02 * white)) / 1.02;
-                            lastOut = output[i];
-                        }
-                    };
-                    const filter = audioCtx.createBiquadFilter();
-                    filter.type = 'bandpass';
-                    filter.frequency.value = 1800;
-                    filter.Q.value = 0.5;
-                    noise.connect(filter);
-                    filter.connect(gain);
-                    gain.connect(window._masterGain || audioCtx.destination);
-                    ambientOsc = noise;
-                } else {
-                    const bufferSize = 4096;
-                    const noise = audioCtx.createScriptProcessor(bufferSize, 1, 1);
-                    noise.onaudioprocess = function (e) {
-                        const output = e.outputBuffer.getChannelData(0);
-                        for (let i = 0; i < bufferSize; i++) {
-                            output[i] = Math.random() * 2 - 1;
-                        }
-                    };
-                    const filter = audioCtx.createBiquadFilter();
-                    filter.type = 'lowpass';
-                    filter.frequency.value = 400;
-                    noise.connect(filter);
-                    filter.connect(gain);
-                    gain.connect(window._masterGain || audioCtx.destination);
-                    ambientOsc = noise;
-                }
-                ambientOsc && ambientOsc.connect && ambientOsc.connect(gain);
-            }
-
-            function stopAmbient() {
-                if (ambientOsc) {
-                    if (ambientOsc.disconnect) ambientOsc.disconnect();
-                    ambientOsc = null;
-                }
-                if (ambientGain) {
-                    ambientGain.disconnect();
-                    ambientGain = null;
-                }
-            }
-
-            function updateSoundIcon() {
-                if (soundEnabled) {
-                    soundIconOn.style.display = 'block';
-                    soundIconOff.style.display = 'none';
-                    soundToggle.setAttribute('aria-label', 'Silenciar sonido');
-                } else {
-                    soundIconOn.style.display = 'none';
-                    soundIconOff.style.display = 'block';
-                    soundToggle.setAttribute('aria-label', 'Activar sonido');
-                }
-            }
-
-            soundToggle.addEventListener('click', () => {
-                if (!audioCtx) initAudio();
-                soundEnabled = !soundEnabled;
-                if (soundEnabled) {
-                    startAmbient();
-                } else {
-                    stopAmbient();
-                }
-                updateSoundIcon();
-                if (window._masterGain) {
-                    window._masterGain.gain.value = soundEnabled ? 0.25 : 0;
+                // ✨ Estela mágica del cursor (solo noche)
+                if (isNightMode && Math.random() > 0.5) {
+                    const trail = document.createElement('div');
+                    trail.className = 'cursor-trail';
+                    trail.style.left = (e.clientX - 7) + 'px';
+                    trail.style.top = (e.clientY - 7) + 'px';
+                    const hue = [75, 200, 280, 180][Math.floor(Math.random() * 4)];
+                    trail.style.background = `radial-gradient(circle, hsla(${hue},100%,82%,0.9), transparent)`;
+                    trail.style.boxShadow = `0 0 10px hsla(${hue},100%,72%,0.6)`;
+                    document.body.appendChild(trail);
+                    setTimeout(() => trail.remove(), 700);
                 }
             });
+        }
 
-            // ═══ Funciones SVG Flores ═══
-            function stem(x1, y1, x2, y2, w) { return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${rnd(STEMS)}" stroke-width="${w}" stroke-linecap="round"/>`; }
-            function leaf(cx, cy, rx, ry, angle) { return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${rnd(LEAVES)}" transform="rotate(${angle} ${cx} ${cy})"/>`; }
-            const gerberaPalettes = [
-                { outer: '#ffffff', mid: '#f0f0f0', inner: '#e0e0e0', center: '#FFB300', dot: '#E65100', stroke: '#cccccc' },
-                { outer: '#E53935', mid: '#c62828', inner: '#b71c1c', center: '#FDD835', dot: '#F57F17', stroke: '#b71c1c' },
-                { outer: '#E91E63', mid: '#c2185b', inner: '#ad1457', center: '#FDD835', dot: '#E65100', stroke: '#ad1457' },
-                { outer: '#FF9800', mid: '#f57c00', inner: '#e65100', center: '#FDD835', dot: '#333', stroke: '#e65100' },
-                { outer: '#9C27B0', mid: '#7b1fa2', inner: '#4a148c', center: '#FDD835', dot: '#1a1a1a', stroke: '#4a148c' },
-                { outer: '#FDD835', mid: '#fbc02d', inner: '#f9a825', center: '#E53935', dot: '#333', stroke: '#f9a825' },
-                { outer: '#26C6DA', mid: '#0097A7', inner: '#006064', center: '#FDD835', dot: '#333', stroke: '#006064' },
-            ];
-            function makeGerbera(pal, S) {
-                const stemH = 68 * S, R = 26 * S, cx = 0, cy = -stemH;
-                const W = (R + 6) * 2.6, H = stemH + R * 2.8;
-                let p = '';
-                for (let i = 0; i < 22; i++) {
-                    const a = (360 / 22) * i;
-                    p += `<ellipse cx="${cx}" cy="${cy - R * 0.45}" rx="${3.2 * S}" ry="${R * 0.85}"
-                fill="${pal.outer}" stroke="${pal.stroke}" stroke-width="${0.5 * S}"
-                transform="rotate(${a} ${cx} ${cy})"/>`;
-                }
-                for (let i = 0; i < 14; i++) {
-                    const a = (360 / 14) * i + (360 / 44);
-                    p += `<ellipse cx="${cx}" cy="${cy - R * 0.38}" rx="${2.8 * S}" ry="${R * 0.62}"
-                fill="${pal.mid}" stroke="${pal.stroke}" stroke-width="${0.4 * S}"
-                transform="rotate(${a} ${cx} ${cy})"/>`;
-                }
-                for (let i = 0; i < 8; i++) {
-                    const a = (360 / 8) * i + (360 / 16);
-                    p += `<ellipse cx="${cx}" cy="${cy - R * 0.25}" rx="${3.5 * S}" ry="${R * 0.38}"
-                fill="${pal.inner}" transform="rotate(${a} ${cx} ${cy})"/>`;
-                }
-                return `<svg width="${W}" height="${H}"
-            viewBox="${-W / 2} ${-(stemH + R * 2.6)} ${W} ${H}"
-            xmlns="http://www.w3.org/2000/svg">
-            ${stem(0, 0, cx, -stemH, 4 * S)}
-            ${leaf(-9 * S, -stemH * 0.42, 13 * S, 4.5 * S, -42)}
-            ${leaf(9 * S, -stemH * 0.68, 13 * S, 4.5 * S, 42)}
-            ${p}
-            <circle cx="${cx}" cy="${cy}" r="${8 * S}" fill="${pal.center}"/>
-            <circle cx="${cx}" cy="${cy}" r="${5 * S}" fill="${pal.dot}"/>
-            <circle cx="${cx}" cy="${cy}" r="${2.5 * S}" fill="${pal.center}" opacity="0.7"/>
-            <circle cx="${cx - 2 * S}" cy="${cy - 2 * S}" r="${1.5 * S}" fill="rgba(255,255,255,0.5)"/>
-        </svg>`;
+        // ═══════════════════════════════════════════════════════════════════════════
+        //  UTILIDADES
+        // ═══════════════════════════════════════════════════════════════════════════
+        const garden = document.getElementById('garden-container');
+        const STEMS = ['#388E3C', '#2E7D32', '#33691E'];
+        const LEAVES = ['#43A047', '#33691E', '#2E7D32', '#558B2F'];
+        function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        function stem(x1, y1, x2, y2, w) { return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${rnd(STEMS)}" stroke-width="${w}" stroke-linecap="round"/>`; }
+        function leaf(cx, cy, rx, ry, angle) { return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${rnd(LEAVES)}" transform="rotate(${angle} ${cx} ${cy})"/>`; }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        //  🌼 GERBERA
+        // ═══════════════════════════════════════════════════════════════════════════
+        const gerberaPalettes = [
+            { outer: '#ffffff', mid: '#f0f0f0', inner: '#e0e0e0', center: '#FFB300', dot: '#E65100', stroke: '#cccccc' },
+            { outer: '#E53935', mid: '#c62828', inner: '#b71c1c', center: '#FDD835', dot: '#F57F17', stroke: '#b71c1c' },
+            { outer: '#E91E63', mid: '#c2185b', inner: '#ad1457', center: '#FDD835', dot: '#E65100', stroke: '#ad1457' },
+            { outer: '#FF9800', mid: '#f57c00', inner: '#e65100', center: '#FDD835', dot: '#333', stroke: '#e65100' },
+            { outer: '#9C27B0', mid: '#7b1fa2', inner: '#4a148c', center: '#FDD835', dot: '#1a1a1a', stroke: '#4a148c' },
+            { outer: '#FDD835', mid: '#fbc02d', inner: '#f9a825', center: '#E53935', dot: '#333', stroke: '#f9a825' },
+            { outer: '#26C6DA', mid: '#0097A7', inner: '#006064', center: '#FDD835', dot: '#333', stroke: '#006064' },
+        ];
+        function makeGerbera(pal, S) {
+            const stemH = 68 * S, R = 26 * S, cx = 0, cy = -stemH;
+            const W = (R + 6) * 2.6, H = stemH + R * 2.8;
+            let p = '';
+            for (let i = 0; i < 22; i++) { const a = (360 / 22) * i; p += `<ellipse cx="${cx}" cy="${cy - R * 0.45}" rx="${3.2 * S}" ry="${R * 0.85}" fill="${pal.outer}" stroke="${pal.stroke}" stroke-width="${0.5 * S}" transform="rotate(${a} ${cx} ${cy})"/>`; }
+            for (let i = 0; i < 14; i++) { const a = (360 / 14) * i + (360 / 44); p += `<ellipse cx="${cx}" cy="${cy - R * 0.38}" rx="${2.8 * S}" ry="${R * 0.62}" fill="${pal.mid}" stroke="${pal.stroke}" stroke-width="${0.4 * S}" transform="rotate(${a} ${cx} ${cy})"/>`; }
+            for (let i = 0; i < 8; i++) { const a = (360 / 8) * i + (360 / 16); p += `<ellipse cx="${cx}" cy="${cy - R * 0.25}" rx="${3.5 * S}" ry="${R * 0.38}" fill="${pal.inner}" transform="rotate(${a} ${cx} ${cy})"/>`; }
+            return `<svg width="${W}" height="${H}" viewBox="${-W / 2} ${-(stemH + R * 2.6)} ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${stem(0, 0, cx, -stemH, 4 * S)}${leaf(-9 * S, -stemH * 0.42, 13 * S, 4.5 * S, -42)}${leaf(9 * S, -stemH * 0.68, 13 * S, 4.5 * S, 42)}${p}<circle cx="${cx}" cy="${cy}" r="${8 * S}" fill="${pal.center}"/><circle cx="${cx}" cy="${cy}" r="${5 * S}" fill="${pal.dot}"/><circle cx="${cx}" cy="${cy}" r="${2.5 * S}" fill="${pal.center}" opacity="0.7"/><circle cx="${cx - 2 * S}" cy="${cy - 2 * S}" r="${1.5 * S}" fill="rgba(255,255,255,0.5)"/></svg>`;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        //  🌷 TULIPÁN
+        // ═══════════════════════════════════════════════════════════════════════════
+        const tulipPalettes = [
+            { p1: '#F44336', p2: '#b71c1c', hi: 'rgba(255,180,180,0.3)' },
+            { p1: '#9C27B0', p2: '#4A148C', hi: 'rgba(206,147,216,0.3)' },
+            { p1: '#FF9800', p2: '#E65100', hi: 'rgba(255,224,130,0.3)' },
+            { p1: '#E91E63', p2: '#880E4F', hi: 'rgba(244,143,177,0.3)' },
+            { p1: '#ECEFF1', p2: '#90A4AE', hi: 'rgba(255,255,255,0.5)' },
+            { p1: '#FDD835', p2: '#F57F17', hi: 'rgba(255,248,160,0.3)' },
+            { p1: '#E040FB', p2: '#7B1FA2', hi: 'rgba(234,128,252,0.3)' },
+        ];
+        function makeTulip(pal, S) {
+            const stemH = 80 * S, fw = 22 * S, fh = 34 * S, cx = 0, cy = -stemH;
+            const W = 68 * S, H = stemH + fh + 10 * S;
+            return `<svg width="${W}" height="${H}" viewBox="${-W / 2} ${-(stemH + fh + 10 * S)} ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${stem(0, 0, 0, -stemH, 4.5 * S)}${leaf(-12 * S, -stemH * 0.42, 15 * S, 5 * S, -38)}${leaf(12 * S, -stemH * 0.68, 15 * S, 5 * S, 38)}<ellipse cx="${cx}" cy="${cy + 5 * S}" rx="${fw * 0.85}" ry="${4.5 * S}" fill="#388E3C"/><ellipse cx="${cx - fw * 0.52}" cy="${cy - fh * 0.3}" rx="${fw * 0.58}" ry="${fh * 0.88}" fill="${pal.p2}" transform="rotate(-16 ${cx - fw * 0.52} ${cy - fh * 0.3})"/><ellipse cx="${cx + fw * 0.52}" cy="${cy - fh * 0.3}" rx="${fw * 0.58}" ry="${fh * 0.88}" fill="${pal.p2}" transform="rotate(16 ${cx + fw * 0.52} ${cy - fh * 0.3})"/><ellipse cx="${cx - fw * 0.9}" cy="${cy - fh * 0.38}" rx="${fw * 0.52}" ry="${fh * 0.82}" fill="${pal.p1}" transform="rotate(-28 ${cx - fw * 0.9} ${cy - fh * 0.38})"/><ellipse cx="${cx + fw * 0.9}" cy="${cy - fh * 0.38}" rx="${fw * 0.52}" ry="${fh * 0.82}" fill="${pal.p1}" transform="rotate(28 ${cx + fw * 0.9} ${cy - fh * 0.38})"/><ellipse cx="${cx}" cy="${cy - fh * 0.44}" rx="${fw * 0.65}" ry="${fh * 0.94}" fill="${pal.p1}"/><line x1="${cx}" y1="${cy - 2 * S}" x2="${cx}" y2="${cy - fh * 0.88}" stroke="${pal.p2}" stroke-width="${1.8 * S}" stroke-linecap="round" opacity="0.4"/><ellipse cx="${cx - fw * 0.2}" cy="${cy - fh * 0.6}" rx="${3.5 * S}" ry="${8 * S}" fill="${pal.hi}" transform="rotate(-8 ${cx - fw * 0.2} ${cy - fh * 0.6})"/></svg>`;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        //  🌸 LOTO
+        // ═══════════════════════════════════════════════════════════════════════════
+        const lotusPalettes = [
+            { p1: '#f8bbd0', p2: '#f48fb1', p3: '#e91e63', center: '#fffde7', lf: '#1b5e20' },
+            { p1: '#e1bee7', p2: '#ce93d8', p3: '#9c27b0', center: '#fffde7', lf: '#1b5e20' },
+            { p1: '#ffffff', p2: '#f5f5f5', p3: '#e0e0e0', center: '#fff176', lf: '#2e7d32' },
+            { p1: '#b3e5fc', p2: '#4fc3f7', p3: '#0288d1', center: '#fff9c4', lf: '#1b5e20' },
+        ];
+        function makeLotus(pal, S) {
+            const stemH = 72 * S, cx = 0, cy = -stemH;
+            const W = 78 * S, H = stemH + 56 * S;
+            let ext = '', mid = '', inn = '';
+            for (let i = 0; i < 8; i++) { const a = (360 / 8) * i; ext += `<ellipse cx="${cx}" cy="${cy - 22 * S}" rx="${6.5 * S}" ry="${20 * S}" fill="${pal.p1}" stroke="${pal.p2}" stroke-width="${0.7 * S}" transform="rotate(${a} ${cx} ${cy}) translate(0 ${3 * S})"/>`; }
+            for (let i = 0; i < 6; i++) { const a = (360 / 6) * i + 20; mid += `<ellipse cx="${cx}" cy="${cy - 16 * S}" rx="${6 * S}" ry="${17 * S}" fill="${pal.p2}" stroke="${pal.p3}" stroke-width="${0.6 * S}" transform="rotate(${a} ${cx} ${cy})"/>`; }
+            for (let i = 0; i < 4; i++) { const a = (360 / 4) * i + 8; inn += `<ellipse cx="${cx}" cy="${cy - 11 * S}" rx="${5 * S}" ry="${12 * S}" fill="${pal.p3}" transform="rotate(${a} ${cx} ${cy})"/>`; }
+            return `<svg width="${W}" height="${H}" viewBox="${-W / 2} ${-(stemH + 54 * S)} ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><path d="M 0 0 Q ${-7 * S} ${-stemH * 0.5} 0 ${-stemH}" stroke="${rnd(STEMS)}" stroke-width="${4 * S}" fill="none" stroke-linecap="round"/><ellipse cx="${-15 * S}" cy="${-stemH * 0.28}" rx="${19 * S}" ry="${10 * S}" fill="${pal.lf}" opacity="0.88"/><ellipse cx="${13 * S}" cy="${-stemH * 0.54}" rx="${14 * S}" ry="${8 * S}" fill="${pal.lf}" opacity="0.72"/>${ext}${mid}${inn}<circle cx="${cx}" cy="${cy}" r="${8 * S}" fill="${pal.center}"/><circle cx="${cx}" cy="${cy}" r="${4.5 * S}" fill="#f9a825"/><circle cx="${cx - 1.5 * S}" cy="${cy - 1.5 * S}" r="${1.8 * S}" fill="rgba(255,255,255,0.5)"/></svg>`;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        //  🌺 ORQUÍDEA
+        // ═══════════════════════════════════════════════════════════════════════════
+        const orchidPalettes = [
+            { bg: '#ce93d8', accent: '#7b1fa2', lip: '#fff9c4', lipA: '#9c27b0', vein: '#6a1b9a' },
+            { bg: '#ffffff', accent: '#e0e0e0', lip: '#e91e63', lipA: '#ad1457', vein: '#880e4f' },
+            { bg: '#f48fb1', accent: '#c2185b', lip: '#fff176', lipA: '#f57f17', vein: '#880e4f' },
+            { bg: '#b39ddb', accent: '#4527a0', lip: '#fffde7', lipA: '#fbc02d', vein: '#311b92' },
+            { bg: '#80deea', accent: '#00838f', lip: '#ffffff', lipA: '#0097a7', vein: '#006064' },
+        ];
+        function makeOrchid(pal, S) {
+            const stemH = 88 * S, cx = 0, cy = -stemH;
+            const W = 82 * S, H = stemH + 52 * S;
+            return `<svg width="${W}" height="${H}" viewBox="${-W / 2} ${-(stemH + 50 * S)} ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><path d="M 0 0 C ${5 * S} ${-stemH * 0.3} ${-5 * S} ${-stemH * 0.7} 0 ${-stemH}" stroke="${rnd(STEMS)}" stroke-width="${3.5 * S}" fill="none" stroke-linecap="round"/>${leaf(-14 * S, -stemH * 0.32, 17 * S, 5.5 * S, -35)}${leaf(14 * S, -stemH * 0.58, 17 * S, 5.5 * S, 35)}<ellipse cx="${cx}" cy="${cy - 22 * S}" rx="${5 * S}" ry="${22 * S}" fill="${pal.accent}" opacity="0.82"/><ellipse cx="${cx - 17 * S}" cy="${cy - 10 * S}" rx="${5 * S}" ry="${18 * S}" fill="${pal.accent}" opacity="0.82" transform="rotate(-48 ${cx - 17 * S} ${cy - 10 * S})"/><ellipse cx="${cx + 17 * S}" cy="${cy - 10 * S}" rx="${5 * S}" ry="${18 * S}" fill="${pal.accent}" opacity="0.82" transform="rotate(48 ${cx + 17 * S} ${cy - 10 * S})"/><ellipse cx="${cx - 20 * S}" cy="${cy - 7 * S}" rx="${19 * S}" ry="${10 * S}" fill="${pal.bg}" stroke="${pal.vein}" stroke-width="${0.7 * S}" transform="rotate(-14 ${cx - 20 * S} ${cy - 7 * S})"/><ellipse cx="${cx + 20 * S}" cy="${cy - 7 * S}" rx="${19 * S}" ry="${10 * S}" fill="${pal.bg}" stroke="${pal.vein}" stroke-width="${0.7 * S}" transform="rotate(14 ${cx + 20 * S} ${cy - 7 * S})"/><line x1="${cx - 28 * S}" y1="${cy - 4 * S}" x2="${cx - 8 * S}" y2="${cy - 10 * S}" stroke="${pal.vein}" stroke-width="${0.8 * S}" opacity="0.4" stroke-linecap="round"/><line x1="${cx + 28 * S}" y1="${cy - 4 * S}" x2="${cx + 8 * S}" y2="${cy - 10 * S}" stroke="${pal.vein}" stroke-width="${0.8 * S}" opacity="0.4" stroke-linecap="round"/><ellipse cx="${cx}" cy="${cy + 11 * S}" rx="${13 * S}" ry="${14 * S}" fill="${pal.lip}" stroke="${pal.lipA}" stroke-width="${1.2 * S}"/><ellipse cx="${cx}" cy="${cy + 13 * S}" rx="${7 * S}" ry="${7.5 * S}" fill="${pal.lipA}" opacity="0.3"/><line x1="${cx}" y1="${cy + 2 * S}" x2="${cx}" y2="${cy + 22 * S}" stroke="${pal.lipA}" stroke-width="${1.2 * S}" stroke-linecap="round" opacity="0.45"/><ellipse cx="${cx}" cy="${cy - 2 * S}" rx="${5 * S}" ry="${8 * S}" fill="${pal.bg}"/><circle cx="${cx}" cy="${cy - 6 * S}" r="${3.5 * S}" fill="${pal.lip}"/><circle cx="${cx - 4 * S}" cy="${cy + 15 * S}" r="${1.8 * S}" fill="${pal.lipA}" opacity="0.6"/><circle cx="${cx + 4 * S}" cy="${cy + 15 * S}" r="${1.8 * S}" fill="${pal.lipA}" opacity="0.6"/><circle cx="${cx}" cy="${cy + 20 * S}" r="${1.4 * S}" fill="${pal.lipA}" opacity="0.4"/></svg>`;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        //  🌸 PEONÍA
+        // ═══════════════════════════════════════════════════════════════════════════
+        const paeonyPalettes = [
+            { p1: '#f8bbd0', p2: '#f48fb1', p3: '#e91e63', p4: '#c2185b', center: '#fffde7' },
+            { p1: '#ffccbc', p2: '#ff8a65', p3: '#f4511e', p4: '#bf360c', center: '#fff176' },
+            { p1: '#ffffff', p2: '#fce4ec', p3: '#f48fb1', p4: '#e91e63', center: '#fffde7' },
+            { p1: '#e1bee7', p2: '#ce93d8', p3: '#ab47bc', p4: '#6a1b9a', center: '#fff9c4' },
+            { p1: '#ffe082', p2: '#ffd54f', p3: '#ffc107', p4: '#f57f17', center: '#fff176' },
+        ];
+        function makePaeony(pal, S) {
+            const stemH = 72 * S, cx = 0, cy = -stemH;
+            const W = 88 * S, H = stemH + 54 * S;
+            const layers = [{ n: 12, ry: 27 * S, rx: 9 * S, fill: pal.p1, rot: 0 }, { n: 10, ry: 22 * S, rx: 8 * S, fill: pal.p2, rot: 18 }, { n: 8, ry: 17 * S, rx: 7 * S, fill: pal.p3, rot: 8 }, { n: 6, ry: 12 * S, rx: 5.5 * S, fill: pal.p4, rot: 22 }];
+            let p = '';
+            for (const L of layers) { for (let i = 0; i < L.n; i++) { const a = (360 / L.n) * i + L.rot; p += `<ellipse cx="${cx}" cy="${cy - L.ry * 0.42}" rx="${L.rx}" ry="${L.ry}" fill="${L.fill}" stroke="rgba(0,0,0,0.05)" stroke-width="${0.5 * S}" transform="rotate(${a} ${cx} ${cy})"/>`; } }
+            return `<svg width="${W}" height="${H}" viewBox="${-W / 2} ${-(stemH + 52 * S)} ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${stem(0, 0, 0, -stemH, 5 * S)}${leaf(-13 * S, -stemH * 0.38, 17 * S, 5.5 * S, -40)}${leaf(13 * S, -stemH * 0.62, 17 * S, 5.5 * S, 40)}${p}<circle cx="${cx}" cy="${cy}" r="${9 * S}" fill="${pal.center}"/><circle cx="${cx}" cy="${cy}" r="${5 * S}" fill="#f9a825" opacity="0.85"/><circle cx="${cx - 3 * S}" cy="${cy - 4 * S}" r="${1.8 * S}" fill="#f57f17"/><circle cx="${cx + 3 * S}" cy="${cy - 3 * S}" r="${1.8 * S}" fill="#f57f17"/><circle cx="${cx}" cy="${cy - 5.5 * S}" r="${1.8 * S}" fill="#f57f17"/><circle cx="${cx - 1.5 * S}" cy="${cy - 1.5 * S}" r="${2.2 * S}" fill="rgba(255,255,255,0.38)"/></svg>`;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        //  🌻 GIRASOL
+        // ═══════════════════════════════════════════════════════════════════════════
+        const sunflowerPalettes = [
+            { p1: '#FFCA28', p2: '#FFB300', center: '#4E342E', hi: '#795548' },
+            { p1: '#FFD740', p2: '#FFA000', center: '#3E2723', hi: '#6D4C41' },
+        ];
+        function makeSunflower(pal, S) {
+            const stemH = 90 * S, cx = 0, cy = -stemH;
+            const W = 92 * S, H = stemH + 56 * S, fr = 21 * S;
+            let outer = '', inner = '';
+            for (let i = 0; i < 16; i++) { outer += `<ellipse cx="${cx}" cy="${cy - fr * 1.68}" rx="${5.5 * S}" ry="${17 * S}" fill="${pal.p1}" transform="rotate(${i * 22.5} ${cx} ${cy})"/>`; }
+            for (let i = 0; i < 12; i++) { inner += `<ellipse cx="${cx}" cy="${cy - fr * 1.22}" rx="${4 * S}" ry="${12 * S}" fill="${pal.p2}" transform="rotate(${i * 30 + 11} ${cx} ${cy})"/>`; }
+            return `<svg width="${W}" height="${H}" viewBox="${-W / 2} ${-(stemH + 54 * S)} ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${stem(0, 0, 0, -stemH, 5.5 * S)}${leaf(-14 * S, -stemH * 0.36, 19 * S, 6.5 * S, -42)}${leaf(14 * S, -stemH * 0.6, 19 * S, 6.5 * S, 42)}${outer}${inner}<circle cx="${cx}" cy="${cy}" r="${fr}" fill="${pal.center}"/><circle cx="${cx}" cy="${cy}" r="${fr * 0.72}" fill="${pal.hi}"/><circle cx="${cx}" cy="${cy}" r="${fr * 0.44}" fill="${pal.center}"/><circle cx="${cx - 5 * S}" cy="${cy - 5 * S}" r="${2.2 * S}" fill="${pal.hi}" opacity="0.65"/><circle cx="${cx + 5 * S}" cy="${cy - 3 * S}" r="${2.2 * S}" fill="${pal.hi}" opacity="0.65"/><circle cx="${cx}" cy="${cy + 6 * S}" r="${2.2 * S}" fill="${pal.hi}" opacity="0.65"/><circle cx="${cx - 1.5 * S}" cy="${cy - 1.5 * S}" r="${2 * S}" fill="rgba(255,255,255,0.2)"/></svg>`;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        //  SELECCIÓN Y SPAWN DE FLORES
+        // ═══════════════════════════════════════════════════════════════════════════
+        function buildFlowerSVG(type, S) {
+            switch (type) {
+                case 'gerbera': return makeGerbera(rnd(gerberaPalettes), S);
+                case 'tulip': return makeTulip(rnd(tulipPalettes), S);
+                case 'lotus': return makeLotus(rnd(lotusPalettes), S);
+                case 'orchid': return makeOrchid(rnd(orchidPalettes), S);
+                case 'paeony': return makePaeony(rnd(paeonyPalettes), S);
+                case 'sunflower': return makeSunflower(rnd(sunflowerPalettes), S);
             }
-            const tulipPalettes = [
-                { p1: '#F44336', p2: '#b71c1c', hi: 'rgba(255,180,180,0.3)' },
-                { p1: '#9C27B0', p2: '#4A148C', hi: 'rgba(206,147,216,0.3)' },
-                { p1: '#FF9800', p2: '#E65100', hi: 'rgba(255,224,130,0.3)' },
-                { p1: '#E91E63', p2: '#880E4F', hi: 'rgba(244,143,177,0.3)' },
-                { p1: '#ECEFF1', p2: '#90A4AE', hi: 'rgba(255,255,255,0.5)' },
-                { p1: '#FDD835', p2: '#F57F17', hi: 'rgba(255,248,160,0.3)' },
-                { p1: '#E040FB', p2: '#7B1FA2', hi: 'rgba(234,128,252,0.3)' },
-            ];
-            function makeTulip(pal, S) {
-                const stemH = 80 * S, fw = 22 * S, fh = 34 * S, cx = 0, cy = -stemH;
-                const W = 68 * S, H = stemH + fh + 10 * S;
-                return `<svg width="${W}" height="${H}"
-            viewBox="${-W / 2} ${-(stemH + fh + 10 * S)} ${W} ${H}"
-            xmlns="http://www.w3.org/2000/svg">
-            ${stem(0, 0, 0, -stemH, 4.5 * S)}
-            ${leaf(-12 * S, -stemH * 0.42, 15 * S, 5 * S, -38)}
-            ${leaf(12 * S, -stemH * 0.68, 15 * S, 5 * S, 38)}
-            <ellipse cx="${cx}" cy="${cy + 5 * S}" rx="${fw * 0.85}" ry="${4.5 * S}" fill="#388E3C"/>
-            <ellipse cx="${cx - fw * 0.52}" cy="${cy - fh * 0.3}" rx="${fw * 0.58}" ry="${fh * 0.88}"
-                fill="${pal.p2}" transform="rotate(-16 ${cx - fw * 0.52} ${cy - fh * 0.3})"/>
-            <ellipse cx="${cx + fw * 0.52}" cy="${cy - fh * 0.3}" rx="${fw * 0.58}" ry="${fh * 0.88}"
-                fill="${pal.p2}" transform="rotate(16 ${cx + fw * 0.52} ${cy - fh * 0.3})"/>
-            <ellipse cx="${cx - fw * 0.9}" cy="${cy - fh * 0.38}" rx="${fw * 0.52}" ry="${fh * 0.82}"
-                fill="${pal.p1}" transform="rotate(-28 ${cx - fw * 0.9} ${cy - fh * 0.38})"/>
-            <ellipse cx="${cx + fw * 0.9}" cy="${cy - fh * 0.38}" rx="${fw * 0.52}" ry="${fh * 0.82}"
-                fill="${pal.p1}" transform="rotate(28 ${cx + fw * 0.9} ${cy - fh * 0.38})"/>
-            <ellipse cx="${cx}" cy="${cy - fh * 0.44}" rx="${fw * 0.65}" ry="${fh * 0.94}" fill="${pal.p1}"/>
-            <line x1="${cx}" y1="${cy - 2 * S}" x2="${cx}" y2="${cy - fh * 0.88}"
-                stroke="${pal.p2}" stroke-width="${1.8 * S}" stroke-linecap="round" opacity="0.4"/>
-            <ellipse cx="${cx - fw * 0.2}" cy="${cy - fh * 0.6}" rx="${3.5 * S}" ry="${8 * S}"
-                fill="${pal.hi}" transform="rotate(-8 ${cx - fw * 0.2} ${cy - fh * 0.6})"/>
-        </svg>`;
+        }
+        const DAY_FLOWERS = ['sunflower', 'sunflower', 'paeony', 'paeony', 'gerbera', 'gerbera', 'tulip'];
+        const NIGHT_FLOWERS = ['lotus', 'lotus', 'orchid', 'orchid', 'gerbera', 'gerbera', 'tulip'];
+
+        function spawnFlower(layer, night) {
+            let sz, op, zi, bot;
+            if (layer === 'back') { sz = Math.random() * 0.18 + 0.28; op = 0.55; zi = 7; bot = Math.random() * 14 + 25; }
+            else if (layer === 'mid') { sz = Math.random() * 0.20 + 0.50; op = 0.82; zi = 8; bot = Math.random() * 10 + 14; }
+            else { sz = Math.random() * 0.25 + 0.72; op = 1; zi = 9; bot = Math.random() * 8 + 5; }
+            const pool = night ? NIGHT_FLOWERS : DAY_FLOWERS;
+            const type = rnd(pool);
+            const svg = buildFlowerSVG(type, sz);
+            if (!svg) return;
+            const w = document.createElement('div');
+            w.className = 'flower-wrapper'; w.innerHTML = svg;
+            w.style.left = (Math.random() * 86 + 4) + '%'; w.style.bottom = bot + '%';
+            w.style.opacity = op; w.style.zIndex = zi;
+            w.style.setProperty('--delay', (Math.random() * 2.5) + 's');
+            w.style.setProperty('--sway-time', (Math.random() * 3 + 3.5) + 's');
+            w.style.setProperty('--sway-deg', (Math.random() * 6 + 2));
+            if (night) w.style.filter = 'drop-shadow(0 0 7px rgba(200,200,255,0.35))';
+            garden.appendChild(w);
+        }
+        function buildGarden(night) {
+            garden.innerHTML = '';
+            for (let i = 0; i < 10; i++) spawnFlower('back', night);
+            for (let i = 0; i < 14; i++) spawnFlower('mid', night);
+            for (let i = 0; i < 10; i++) spawnFlower('front', night);
+        }
+        buildGarden(isNightMode);
+
+        // ─── INTERACCIÓN FLORES ──────────────────────────────────────────────────────
+        const sparkleColors = ['#ffeb3b', '#ff4081', '#4caf50', '#00e5ff', '#ffffff', '#ff9800', '#ce93d8', '#80deea'];
+        const loveMessages = [
+            "Qué hermosa te quiero ❤️", "Eres la mejor 🌹", "Me encantan tus ojos",
+            "Tus ojos brillan más que las estrellas ✨", "Me pierdo en tu mirada",
+            "Tu pelo está increíble 💇‍♀️", "Me encanta tu cabello", "Tu sonrisa me alegra el día",
+            "Me haces muy feliz", "Eres especial para mí", "Contigo todo es mejor",
+            "Qué suerte tenerte", "Me encantas mucho", "Eres luz en mi día 🌸",
+            "Eres mi persona favorita", "Te pienso todo el día",
+            "Eres un sueño hecho realidad", "Eres única y especial",
+            "Contigo todo es mágico", "Eres la mejor compañía 🌺"
+        ];
+        garden.addEventListener('click', (e) => {
+            const flower = e.target.closest('.flower-wrapper');
+            if (!flower) return;
+            flower.classList.remove('touched'); void flower.offsetWidth; flower.classList.add('touched');
+            setTimeout(() => flower.classList.remove('touched'), 500);
+            for (let i = 0; i < 14; i++) {
+                const s = document.createElement('div'); s.className = 'sparkle';
+                s.style.left = e.pageX + 'px'; s.style.top = e.pageY + 'px';
+                s.style.background = sparkleColors[Math.floor(Math.random() * sparkleColors.length)];
+                s.style.setProperty('--tx', (Math.random() - 0.5) * 130 + 'px');
+                s.style.setProperty('--ty', (Math.random() - 0.5) * 130 - 40 + 'px');
+                document.body.appendChild(s); setTimeout(() => s.remove(), 700);
             }
-            const lotusPalettes = [
-                { p1: '#f8bbd0', p2: '#f48fb1', p3: '#e91e63', center: '#fffde7', lf: '#1b5e20' },
-                { p1: '#e1bee7', p2: '#ce93d8', p3: '#9c27b0', center: '#fffde7', lf: '#1b5e20' },
-                { p1: '#ffffff', p2: '#f5f5f5', p3: '#e0e0e0', center: '#fff176', lf: '#2e7d32' },
-                { p1: '#b3e5fc', p2: '#4fc3f7', p3: '#0288d1', center: '#fff9c4', lf: '#1b5e20' },
-            ];
-            function makeLotus(pal, S) {
-                const stemH = 72 * S, cx = 0, cy = -stemH;
-                const W = 78 * S, H = stemH + 56 * S;
-                let ext = '', mid = '', inn = '';
-                for (let i = 0; i < 8; i++) {
-                    const a = (360 / 8) * i;
-                    ext += `<ellipse cx="${cx}" cy="${cy - 22 * S}" rx="${6.5 * S}" ry="${20 * S}"
-                fill="${pal.p1}" stroke="${pal.p2}" stroke-width="${0.7 * S}"
-                transform="rotate(${a} ${cx} ${cy}) translate(0 ${3 * S})"/>`;
-                }
-                for (let i = 0; i < 6; i++) {
-                    const a = (360 / 6) * i + 20;
-                    mid += `<ellipse cx="${cx}" cy="${cy - 16 * S}" rx="${6 * S}" ry="${17 * S}"
-                fill="${pal.p2}" stroke="${pal.p3}" stroke-width="${0.6 * S}"
-                transform="rotate(${a} ${cx} ${cy})"/>`;
-                }
-                for (let i = 0; i < 4; i++) {
-                    const a = (360 / 4) * i + 8;
-                    inn += `<ellipse cx="${cx}" cy="${cy - 11 * S}" rx="${5 * S}" ry="${12 * S}"
-                fill="${pal.p3}" transform="rotate(${a} ${cx} ${cy})"/>`;
-                }
-                return `<svg width="${W}" height="${H}"
-            viewBox="${-W / 2} ${-(stemH + 54 * S)} ${W} ${H}"
-            xmlns="http://www.w3.org/2000/svg">
-            <path d="M 0 0 Q ${-7 * S} ${-stemH * 0.5} 0 ${-stemH}"
-                stroke="${rnd(STEMS)}" stroke-width="${4 * S}" fill="none" stroke-linecap="round"/>
-            <ellipse cx="${-15 * S}" cy="${-stemH * 0.28}" rx="${19 * S}" ry="${10 * S}"
-                fill="${pal.lf}" opacity="0.88"/>
-            <ellipse cx="${13 * S}" cy="${-stemH * 0.54}" rx="${14 * S}" ry="${8 * S}"
-                fill="${pal.lf}" opacity="0.72"/>
-            ${ext}${mid}${inn}
-            <circle cx="${cx}" cy="${cy}" r="${8 * S}" fill="${pal.center}"/>
-            <circle cx="${cx}" cy="${cy}" r="${4.5 * S}" fill="#f9a825"/>
-            <circle cx="${cx - 1.5 * S}" cy="${cy - 1.5 * S}" r="${1.8 * S}" fill="rgba(255,255,255,0.5)"/>
-        </svg>`;
+            const msg = document.createElement('div'); msg.className = 'floating-message';
+            msg.textContent = loveMessages[Math.floor(Math.random() * loveMessages.length)];
+            msg.style.left = e.pageX + 'px'; msg.style.top = (e.pageY - 40) + 'px';
+            document.body.appendChild(msg); setTimeout(() => msg.remove(), 3000);
+        });
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        //  CANVAS — PARTÍCULAS
+        // ═══════════════════════════════════════════════════════════════════════════
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let creatures = []; let shootingStarTimeout;
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+        // ─── 🔥 LUCIÉRNAGA (con reactividad al cursor) ──────────────────────────────
+        class Firefly {
+            constructor() { this.reset(true); }
+            reset(init) {
+                this.x = Math.random() * canvas.width;
+                this.y = init ? canvas.height * 0.2 + Math.random() * canvas.height * 0.7 : canvas.height * 0.25 + Math.random() * canvas.height * 0.6;
+                this.size = Math.random() * 2.5 + 1.5; this.speedX = (Math.random() - 0.5) * 0.5; this.speedY = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random(); this.fadeDir = Math.random() > 0.5 ? 1 : -1; this.fadeSpeed = Math.random() * 0.015 + 0.005;
+                this.angle = Math.random() * Math.PI * 2; this.angleSpeed = (Math.random() - 0.5) * 0.04;
+                this.trailX = []; this.trailY = []; this.hue = Math.random() > 0.5 ? 75 : 55;
             }
-            const orchidPalettes = [
-                { bg: '#ce93d8', accent: '#7b1fa2', lip: '#fff9c4', lipA: '#9c27b0', vein: '#6a1b9a' },
-                { bg: '#ffffff', accent: '#e0e0e0', lip: '#e91e63', lipA: '#ad1457', vein: '#880e4f' },
-                { bg: '#f48fb1', accent: '#c2185b', lip: '#fff176', lipA: '#f57f17', vein: '#880e4f' },
-                { bg: '#b39ddb', accent: '#4527a0', lip: '#fffde7', lipA: '#fbc02d', vein: '#311b92' },
-                { bg: '#80deea', accent: '#00838f', lip: '#ffffff', lipA: '#0097a7', vein: '#006064' },
-            ];
-            function makeOrchid(pal, S) {
-                const stemH = 88 * S, cx = 0, cy = -stemH;
-                const W = 82 * S, H = stemH + 52 * S;
-                return `<svg width="${W}" height="${H}"
-            viewBox="${-W / 2} ${-(stemH + 50 * S)} ${W} ${H}"
-            xmlns="http://www.w3.org/2000/svg">
-            <path d="M 0 0 C ${5 * S} ${-stemH * 0.3} ${-5 * S} ${-stemH * 0.7} 0 ${-stemH}"
-                stroke="${rnd(STEMS)}" stroke-width="${3.5 * S}" fill="none" stroke-linecap="round"/>
-            ${leaf(-14 * S, -stemH * 0.32, 17 * S, 5.5 * S, -35)}
-            ${leaf(14 * S, -stemH * 0.58, 17 * S, 5.5 * S, 35)}
-            <ellipse cx="${cx}" cy="${cy - 22 * S}" rx="${5 * S}" ry="${22 * S}" fill="${pal.accent}" opacity="0.82"/>
-            <ellipse cx="${cx - 17 * S}" cy="${cy - 10 * S}" rx="${5 * S}" ry="${18 * S}"
-                fill="${pal.accent}" opacity="0.82" transform="rotate(-48 ${cx - 17 * S} ${cy - 10 * S})"/>
-            <ellipse cx="${cx + 17 * S}" cy="${cy - 10 * S}" rx="${5 * S}" ry="${18 * S}"
-                fill="${pal.accent}" opacity="0.82" transform="rotate(48 ${cx + 17 * S} ${cy - 10 * S})"/>
-            <ellipse cx="${cx - 20 * S}" cy="${cy - 7 * S}" rx="${19 * S}" ry="${10 * S}"
-                fill="${pal.bg}" stroke="${pal.vein}" stroke-width="${0.7 * S}"
-                transform="rotate(-14 ${cx - 20 * S} ${cy - 7 * S})"/>
-            <ellipse cx="${cx + 20 * S}" cy="${cy - 7 * S}" rx="${19 * S}" ry="${10 * S}"
-                fill="${pal.bg}" stroke="${pal.vein}" stroke-width="${0.7 * S}"
-                transform="rotate(14 ${cx + 20 * S} ${cy - 7 * S})"/>
-            <line x1="${cx - 28 * S}" y1="${cy - 4 * S}" x2="${cx - 8 * S}" y2="${cy - 10 * S}"
-                stroke="${pal.vein}" stroke-width="${0.8 * S}" opacity="0.4" stroke-linecap="round"/>
-            <line x1="${cx + 28 * S}" y1="${cy - 4 * S}" x2="${cx + 8 * S}" y2="${cy - 10 * S}"
-                stroke="${pal.vein}" stroke-width="${0.8 * S}" opacity="0.4" stroke-linecap="round"/>
-            <ellipse cx="${cx}" cy="${cy + 11 * S}" rx="${13 * S}" ry="${14 * S}"
-                fill="${pal.lip}" stroke="${pal.lipA}" stroke-width="${1.2 * S}"/>
-            <ellipse cx="${cx}" cy="${cy + 13 * S}" rx="${7 * S}" ry="${7.5 * S}"
-                fill="${pal.lipA}" opacity="0.3"/>
-            <line x1="${cx}" y1="${cy + 2 * S}" x2="${cx}" y2="${cy + 22 * S}"
-                stroke="${pal.lipA}" stroke-width="${1.2 * S}" stroke-linecap="round" opacity="0.45"/>
-            <ellipse cx="${cx}" cy="${cy - 2 * S}" rx="${5 * S}" ry="${8 * S}" fill="${pal.bg}"/>
-            <circle cx="${cx}" cy="${cy - 6 * S}" r="${3.5 * S}" fill="${pal.lip}"/>
-            <circle cx="${cx - 4 * S}" cy="${cy + 15 * S}" r="${1.8 * S}" fill="${pal.lipA}" opacity="0.6"/>
-            <circle cx="${cx + 4 * S}" cy="${cy + 15 * S}" r="${1.8 * S}" fill="${pal.lipA}" opacity="0.6"/>
-            <circle cx="${cx}" cy="${cy + 20 * S}" r="${1.4 * S}" fill="${pal.lipA}" opacity="0.4"/>
-        </svg>`;
+            update() {
+                this.angle += this.angleSpeed;
+                this.x += this.speedX + Math.sin(this.angle) * 0.6;
+                this.y += this.speedY + Math.cos(this.angle * 0.7) * 0.4;
+                // 🔥 Reacción al cursor: se alejan suavemente
+                if (!isTouchDevice) {
+                    const dx = this.x - mouseX, dy = this.y - mouseY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 130 && dist > 0) {
+                        const force = (130 - dist) / 130 * 0.4;
+                        this.x += dx / dist * force; this.y += dy / dist * force;
+                    }
+                }
+                this.opacity += this.fadeDir * this.fadeSpeed;
+                if (this.opacity >= 1) { this.opacity = 1; this.fadeDir = -1; }
+                if (this.opacity <= 0) { this.opacity = 0; this.fadeDir = 1; }
+                this.trailX.unshift(this.x); this.trailY.unshift(this.y);
+                if (this.trailX.length > 8) { this.trailX.pop(); this.trailY.pop(); }
+                if (this.x < -20 || this.x > canvas.width + 20 || this.y < -20 || this.y > canvas.height + 20) this.reset(false);
             }
-            const paeonyPalettes = [
-                { p1: '#f8bbd0', p2: '#f48fb1', p3: '#e91e63', p4: '#c2185b', center: '#fffde7' },
-                { p1: '#ffccbc', p2: '#ff8a65', p3: '#f4511e', p4: '#bf360c', center: '#fff176' },
-                { p1: '#ffffff', p2: '#fce4ec', p3: '#f48fb1', p4: '#e91e63', center: '#fffde7' },
-                { p1: '#e1bee7', p2: '#ce93d8', p3: '#ab47bc', p4: '#6a1b9a', center: '#fff9c4' },
-                { p1: '#ffe082', p2: '#ffd54f', p3: '#ffc107', p4: '#f57f17', center: '#fff176' },
-            ];
-            function makePaeony(pal, S) {
-                const stemH = 72 * S, cx = 0, cy = -stemH;
-                const W = 88 * S, H = stemH + 54 * S;
-                const layers = [
-                    { n: 12, ry: 27 * S, rx: 9 * S, fill: pal.p1, rot: 0 },
-                    { n: 10, ry: 22 * S, rx: 8 * S, fill: pal.p2, rot: 18 },
-                    { n: 8, ry: 17 * S, rx: 7 * S, fill: pal.p3, rot: 8 },
-                    { n: 6, ry: 12 * S, rx: 5.5 * S, fill: pal.p4, rot: 22 },
+            draw() {
+                for (let i = 1; i < this.trailX.length; i++) {
+                    const a = (this.opacity * (1 - i / this.trailX.length)) * 0.4;
+                    ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = `hsl(${this.hue},100%,70%)`;
+                    ctx.shadowBlur = 8; ctx.shadowColor = `hsl(${this.hue},100%,60%)`;
+                    ctx.beginPath(); ctx.arc(this.trailX[i], this.trailY[i], this.size * (1 - i / this.trailX.length) * 0.8, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+                }
+                ctx.save(); ctx.globalAlpha = this.opacity;
+                const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 5);
+                g.addColorStop(0, `hsla(${this.hue},100%,75%,0.4)`); g.addColorStop(1, `hsla(${this.hue},100%,75%,0)`);
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(this.x, this.y, this.size * 5, 0, Math.PI * 2); ctx.fill();
+                ctx.shadowBlur = 20; ctx.shadowColor = `hsl(${this.hue},100%,70%)`;
+                ctx.fillStyle = `hsl(${this.hue},100%,90%)`; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+            }
+        }
+
+        // ─── 🐝 ABEJA ────────────────────────────────────────────────────────────────
+        class Bee {
+            constructor(i) { this.index = i; this.reset(); }
+            reset() {
+                this.x = -60; this.baseY = canvas.height * 0.25 + Math.random() * canvas.height * 0.5;
+                this.y = this.baseY; this.speedX = Math.random() * 1.8 + 1.2;
+                this.wingAngle = Math.random() * Math.PI * 2; this.bodySize = Math.random() * 3 + 7;
+                this.phase = Math.random() * Math.PI * 2; this.wobble = Math.random() * 30 + 20;
+                this.pathFreq = Math.random() * 0.015 + 0.01; this.delay = this.index * 180;
+            }
+            update() {
+                this.delay = Math.max(0, this.delay - 1); if (this.delay > 0) return;
+                this.x += this.speedX; this.wingAngle += 0.45;
+                this.y = this.baseY + Math.sin(this.x * this.pathFreq + this.phase) * this.wobble;
+                if (this.x > canvas.width + 70) { this.x = -60; this.baseY = canvas.height * 0.25 + Math.random() * canvas.height * 0.5; this.phase = Math.random() * Math.PI * 2; this.speedX = Math.random() * 1.8 + 1.2; }
+            }
+            draw() {
+                if (this.delay > 0) return;
+                const { x, y, bodySize: bs, wingAngle } = this; ctx.save(); ctx.translate(x, y);
+                const wf = Math.abs(Math.sin(wingAngle)), wf2 = Math.abs(Math.sin(wingAngle + 0.8));
+                ctx.fillStyle = 'rgba(210,230,255,0.72)'; ctx.strokeStyle = 'rgba(100,160,220,0.5)'; ctx.lineWidth = 0.8;
+                ctx.beginPath(); ctx.ellipse(-bs * 0.7, -bs * 0.7, bs * 0.9, wf * bs * 1.1, -0.4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.ellipse(bs * 0.7, -bs * 0.7, bs * 0.9, wf2 * bs * 1.1, 0.4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                const bg = ctx.createRadialGradient(-bs * 0.2, -bs * 0.3, 0, 0, 0, bs);
+                bg.addColorStop(0, '#FFE066'); bg.addColorStop(0.5, '#FFB300'); bg.addColorStop(1, '#F57F17');
+                ctx.fillStyle = bg; ctx.beginPath(); ctx.ellipse(0, 0, bs * 0.6, bs, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = 'rgba(20,10,0,0.85)';
+                for (let s = 0; s < 3; s++) { ctx.beginPath(); ctx.ellipse(0, -bs * 0.3 + s * bs * 0.38, bs * 0.5, bs * 0.22, 0, 0, Math.PI * 2); ctx.fill(); }
+                const hg = ctx.createRadialGradient(-bs * 0.15, -bs * 1.2, 0, 0, -bs * 1.1, bs * 0.55);
+                hg.addColorStop(0, '#FFF176'); hg.addColorStop(1, '#F9A825');
+                ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(0, -bs * 1.05, bs * 0.52, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#1a1a1a';
+                ctx.beginPath(); ctx.arc(-bs * 0.22, -bs * 1.12, bs * 0.14, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(bs * 0.22, -bs * 1.12, bs * 0.14, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = '#333'; ctx.lineWidth = 1.2;
+                ctx.beginPath(); ctx.moveTo(-bs * 0.2, -bs * 1.5); ctx.quadraticCurveTo(-bs * 0.8, -bs * 2.3, -bs * 0.6, -bs * 2.6); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(bs * 0.2, -bs * 1.5); ctx.quadraticCurveTo(bs * 0.8, -bs * 2.3, bs * 0.6, -bs * 2.6); ctx.stroke();
+                ctx.fillStyle = '#333';
+                ctx.beginPath(); ctx.arc(-bs * 0.6, -bs * 2.6, bs * 0.15, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(bs * 0.6, -bs * 2.6, bs * 0.15, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // ─── 🦋 MARIPOSA ─────────────────────────────────────────────────────────────
+        class Butterfly {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height * 0.12 + Math.random() * canvas.height * 0.55;
+                this.size = Math.random() * 5 + 7;
+                this.wingAngle = Math.random() * Math.PI * 2;
+                this.wingSpeed = Math.random() * 0.12 + 0.08;
+                this.dirX = Math.random() > 0.5 ? 1 : -1;
+                this.speedX = (Math.random() * 0.7 + 0.3) * this.dirX;
+                this.wobblePhase = Math.random() * Math.PI * 2;
+                this.wobbleFreq = Math.random() * 0.025 + 0.01;
+                this.wobbleAmp = Math.random() * 1.8 + 0.5;
+                this.turnTimer = Math.random() * 300 + 100;
+                const pals = [
+                    { w: '#FF9800', a: '#E65100', s: '#fff3e0' }, { w: '#E91E63', a: '#880E4F', s: '#fce4ec' },
+                    { w: '#2196F3', a: '#0D47A1', s: '#e3f2fd' }, { w: '#FFEB3B', a: '#F57F17', s: '#fffde7' },
+                    { w: '#9C27B0', a: '#4A148C', s: '#f3e5f5' }, { w: '#FF5722', a: '#BF360C', s: '#fbe9e7' },
+                    { w: '#00BCD4', a: '#006064', s: '#e0f7fa' }, { w: '#8BC34A', a: '#33691E', s: '#f1f8e9' },
                 ];
-                let p = '';
-                for (const L of layers) {
-                    for (let i = 0; i < L.n; i++) {
-                        const a = (360 / L.n) * i + L.rot;
-                        p += `<ellipse cx="${cx}" cy="${cy - L.ry * 0.42}" rx="${L.rx}" ry="${L.ry}"
-                    fill="${L.fill}" stroke="rgba(0,0,0,0.05)" stroke-width="${0.5 * S}"
-                    transform="rotate(${a} ${cx} ${cy})"/>`;
-                    }
-                }
-                return `<svg width="${W}" height="${H}"
-            viewBox="${-W / 2} ${-(stemH + 52 * S)} ${W} ${H}"
-            xmlns="http://www.w3.org/2000/svg">
-            ${stem(0, 0, 0, -stemH, 5 * S)}
-            ${leaf(-13 * S, -stemH * 0.38, 17 * S, 5.5 * S, -40)}
-            ${leaf(13 * S, -stemH * 0.62, 17 * S, 5.5 * S, 40)}
-            ${p}
-            <circle cx="${cx}" cy="${cy}" r="${9 * S}" fill="${pal.center}"/>
-            <circle cx="${cx}" cy="${cy}" r="${5 * S}" fill="#f9a825" opacity="0.85"/>
-            <circle cx="${cx - 3 * S}" cy="${cy - 4 * S}" r="${1.8 * S}" fill="#f57f17"/>
-            <circle cx="${cx + 3 * S}" cy="${cy - 3 * S}" r="${1.8 * S}" fill="#f57f17"/>
-            <circle cx="${cx}" cy="${cy - 5.5 * S}" r="${1.8 * S}" fill="#f57f17"/>
-            <circle cx="${cx - 1.5 * S}" cy="${cy - 1.5 * S}" r="${2.2 * S}" fill="rgba(255,255,255,0.38)"/>
-        </svg>`;
+                this.colors = pals[Math.floor(Math.random() * pals.length)];
             }
-            const sunflowerPalettes = [
-                { p1: '#FFCA28', p2: '#FFB300', center: '#4E342E', hi: '#795548' },
-                { p1: '#FFD740', p2: '#FFA000', center: '#3E2723', hi: '#6D4C41' },
-            ];
-            function makeSunflower(pal, S) {
-                const stemH = 90 * S, cx = 0, cy = -stemH;
-                const W = 92 * S, H = stemH + 56 * S, fr = 21 * S;
-                let outer = '', inner = '';
-                for (let i = 0; i < 16; i++) {
-                    outer += `<ellipse cx="${cx}" cy="${cy - fr * 1.68}" rx="${5.5 * S}" ry="${17 * S}"
-                fill="${pal.p1}" transform="rotate(${i * 22.5} ${cx} ${cy})"/>`;
-                }
-                for (let i = 0; i < 12; i++) {
-                    inner += `<ellipse cx="${cx}" cy="${cy - fr * 1.22}" rx="${4 * S}" ry="${12 * S}"
-                fill="${pal.p2}" transform="rotate(${i * 30 + 11} ${cx} ${cy})"/>`;
-                }
-                return `<svg width="${W}" height="${H}"
-            viewBox="${-W / 2} ${-(stemH + 54 * S)} ${W} ${H}"
-            xmlns="http://www.w3.org/2000/svg">
-            ${stem(0, 0, 0, -stemH, 5.5 * S)}
-            ${leaf(-14 * S, -stemH * 0.36, 19 * S, 6.5 * S, -42)}
-            ${leaf(14 * S, -stemH * 0.6, 19 * S, 6.5 * S, 42)}
-            ${outer}${inner}
-            <circle cx="${cx}" cy="${cy}" r="${fr}" fill="${pal.center}"/>
-            <circle cx="${cx}" cy="${cy}" r="${fr * 0.72}" fill="${pal.hi}"/>
-            <circle cx="${cx}" cy="${cy}" r="${fr * 0.44}" fill="${pal.center}"/>
-            <circle cx="${cx - 5 * S}" cy="${cy - 5 * S}" r="${2.2 * S}" fill="${pal.hi}" opacity="0.65"/>
-            <circle cx="${cx + 5 * S}" cy="${cy - 3 * S}" r="${2.2 * S}" fill="${pal.hi}" opacity="0.65"/>
-            <circle cx="${cx}" cy="${cy + 6 * S}" r="${2.2 * S}" fill="${pal.hi}" opacity="0.65"/>
-            <circle cx="${cx - 1.5 * S}" cy="${cy - 1.5 * S}" r="${2 * S}" fill="rgba(255,255,255,0.2)"/>
-        </svg>`;
+            update() {
+                this.wingAngle += this.wingSpeed;
+                this.wobblePhase += this.wobbleFreq;
+                this.x += this.speedX;
+                this.y += Math.sin(this.wobblePhase) * this.wobbleAmp;
+                this.turnTimer--;
+                if (this.turnTimer <= 0) { this.dirX *= -1; this.speedX = (Math.random() * 0.7 + 0.3) * this.dirX; this.turnTimer = Math.random() * 300 + 100; }
+                if (this.x < -40) this.x = canvas.width + 40;
+                if (this.x > canvas.width + 40) this.x = -40;
+                if (this.y < canvas.height * 0.05) this.y = canvas.height * 0.05;
+                if (this.y > canvas.height * 0.78) this.y = canvas.height * 0.78;
             }
-            const DAY_FLOWERS = ['sunflower', 'sunflower', 'paeony', 'paeony', 'gerbera', 'gerbera', 'tulip'];
-            const NIGHT_FLOWERS = ['lotus', 'lotus', 'orchid', 'orchid', 'gerbera', 'gerbera', 'tulip'];
-
-            function buildFlowerSVG(type, S) {
-                switch (type) {
-                    case 'gerbera': return makeGerbera(rnd(gerberaPalettes), S);
-                    case 'tulip': return makeTulip(rnd(tulipPalettes), S);
-                    case 'lotus': return makeLotus(rnd(lotusPalettes), S);
-                    case 'orchid': return makeOrchid(rnd(orchidPalettes), S);
-                    case 'paeony': return makePaeony(rnd(paeonyPalettes), S);
-                    case 'sunflower': return makeSunflower(rnd(sunflowerPalettes), S);
-                }
+            draw() {
+                const { x, y, size: s, wingAngle, colors, dirX } = this;
+                const flap = Math.abs(Math.sin(wingAngle));
+                ctx.save(); ctx.translate(x, y); ctx.scale(dirX, 1);
+                // Sombra ligera
+                ctx.globalAlpha = 0.1; ctx.fillStyle = '#000';
+                ctx.beginPath(); ctx.ellipse(3, s * 0.9, s * 0.5, s * 0.12, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.globalAlpha = 1;
+                // Alas superiores
+                ctx.save(); ctx.transform(1, 0, 0, flap, 0, 0);
+                ctx.fillStyle = colors.w;
+                ctx.beginPath(); ctx.ellipse(s * 0.55, -s * 0.2, s * 0.95, s * 0.75, -0.25, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = colors.a; ctx.lineWidth = 0.9; ctx.stroke();
+                ctx.fillStyle = colors.s; ctx.beginPath(); ctx.arc(s * 0.55, -s * 0.25, s * 0.28, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(-s * 0.55, -s * 0.2, s * 0.95, s * 0.75, 0.25, 0, Math.PI * 2); ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = colors.s; ctx.beginPath(); ctx.arc(-s * 0.55, -s * 0.25, s * 0.28, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+                // Alas inferiores
+                ctx.save(); ctx.transform(1, 0, 0, flap * 0.85, 0, 0);
+                ctx.globalAlpha = 0.82; ctx.fillStyle = colors.w;
+                ctx.beginPath(); ctx.ellipse(s * 0.42, s * 0.35, s * 0.6, s * 0.48, 0.2, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = colors.a; ctx.lineWidth = 0.7; ctx.stroke();
+                ctx.beginPath(); ctx.ellipse(-s * 0.42, s * 0.35, s * 0.6, s * 0.48, -0.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.globalAlpha = 1; ctx.restore();
+                // Cuerpo
+                ctx.fillStyle = '#2c2c2c'; ctx.beginPath(); ctx.ellipse(0, 0, s * 0.1, s * 0.55, 0, 0, Math.PI * 2); ctx.fill();
+                // Cabeza
+                ctx.fillStyle = '#2c2c2c'; ctx.beginPath(); ctx.arc(0, -s * 0.6, s * 0.15, 0, Math.PI * 2); ctx.fill();
+                // Antenas
+                ctx.strokeStyle = '#2c2c2c'; ctx.lineWidth = 0.8;
+                ctx.beginPath(); ctx.moveTo(-s * 0.05, -s * 0.7); ctx.quadraticCurveTo(-s * 0.35, -s * 1.15, -s * 0.45, -s * 1.2); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(s * 0.05, -s * 0.7); ctx.quadraticCurveTo(s * 0.35, -s * 1.15, s * 0.45, -s * 1.2); ctx.stroke();
+                ctx.fillStyle = '#2c2c2c';
+                ctx.beginPath(); ctx.arc(-s * 0.45, -s * 1.2, 1.2, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(s * 0.45, -s * 1.2, 1.2, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
             }
+        }
 
-            function spawnFlower(layer, night) {
-                let sz, op, zi, bot;
-                if (layer === 'back') { sz = Math.random() * 0.18 + 0.28; op = 0.55; zi = 7; bot = Math.random() * 14 + 25; }
-                else if (layer === 'mid') { sz = Math.random() * 0.20 + 0.50; op = 0.82; zi = 8; bot = Math.random() * 10 + 14; }
-                else { sz = Math.random() * 0.25 + 0.72; op = 1; zi = 9; bot = Math.random() * 8 + 5; }
-                const pool = night ? NIGHT_FLOWERS : DAY_FLOWERS;
-                const type = rnd(pool);
-                const svg = buildFlowerSVG(type, sz);
-                if (!svg) return;
-                const w = document.createElement('div');
-                w.className = 'flower-wrapper';
-                w.innerHTML = svg;
-                w.style.left = (Math.random() * 86 + 4) + '%';
-                w.style.bottom = bot + '%';
-                w.style.opacity = op;
-                w.style.zIndex = zi;
-                w.style.setProperty('--delay', (Math.random() * 2.5) + 's');
-                w.style.setProperty('--sway-time', (Math.random() * 3 + 3.5) + 's');
-                w.style.setProperty('--sway-deg', (Math.random() * 6 + 2));
-                if (night) w.style.filter = 'drop-shadow(0 0 7px rgba(200,200,255,0.35))';
-                const svgEl = w.querySelector('svg');
-                if (svgEl) svgEl.setAttribute('aria-hidden', 'true');
-                garden.appendChild(w);
+        // ─── 🌸 PÉTALO CAYENDO ───────────────────────────────────────────────────────
+        class FallingPetal {
+            constructor() { this.reset(true); }
+            reset(init) {
+                this.x = Math.random() * canvas.width;
+                this.y = init ? Math.random() * canvas.height : -20;
+                this.size = Math.random() * 5 + 3;
+                this.speedY = Math.random() * 0.7 + 0.25;
+                this.speedX = Math.random() * 0.4 - 0.2;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotSpeed = (Math.random() - 0.5) * 0.035;
+                this.wobblePhase = Math.random() * Math.PI * 2;
+                this.wobbleFreq = Math.random() * 0.018 + 0.008;
+                this.wobbleAmp = Math.random() * 1.5 + 0.5;
+                this.opacity = Math.random() * 0.45 + 0.25;
+                const cols = ['#f8bbd0', '#f48fb1', '#fce4ec', '#ffffff', '#fff9c4', '#ffccbc', '#e1bee7'];
+                this.color = cols[Math.floor(Math.random() * cols.length)];
             }
-
-            function buildGarden(night) {
-                garden.innerHTML = '';
-                for (let i = 0; i < 10; i++) spawnFlower('back', night);
-                for (let i = 0; i < 14; i++) spawnFlower('mid', night);
-                for (let i = 0; i < 10; i++) spawnFlower('front', night);
+            update() {
+                this.wobblePhase += this.wobbleFreq;
+                this.x += this.speedX + Math.sin(this.wobblePhase) * this.wobbleAmp;
+                this.y += this.speedY;
+                this.rotation += this.rotSpeed;
+                if (this.y > canvas.height + 20) this.reset(false);
             }
-
-            // ═══ Clases Criaturas ═══
-            class Firefly {
-                constructor() { this.reset(true); }
-                reset(init) {
-                    this.x = Math.random() * canvas.width;
-                    this.y = init ? canvas.height * 0.2 + Math.random() * canvas.height * 0.7 : canvas.height * 0.25 + Math.random() * canvas.height * 0.6;
-                    this.size = Math.random() * 2.5 + 1.5; this.speedX = (Math.random() - 0.5) * 0.5; this.speedY = (Math.random() - 0.5) * 0.5;
-                    this.opacity = Math.random(); this.fadeDir = Math.random() > 0.5 ? 1 : -1; this.fadeSpeed = Math.random() * 0.015 + 0.005;
-                    this.angle = Math.random() * Math.PI * 2; this.angleSpeed = (Math.random() - 0.5) * 0.04;
-                    this.trailX = []; this.trailY = []; this.hue = Math.random() > 0.5 ? 75 : 55;
-                }
-                update() {
-                    this.angle += this.angleSpeed;
-                    this.x += this.speedX + Math.sin(this.angle) * 0.6; this.y += this.speedY + Math.cos(this.angle * 0.7) * 0.4;
-                    this.opacity += this.fadeDir * this.fadeSpeed;
-                    if (this.opacity >= 1) { this.opacity = 1; this.fadeDir = -1; }
-                    if (this.opacity <= 0) { this.opacity = 0; this.fadeDir = 1; }
-                    this.trailX.unshift(this.x); this.trailY.unshift(this.y);
-                    if (this.trailX.length > 8) { this.trailX.pop(); this.trailY.pop(); }
-                    if (this.x < -20 || this.x > canvas.width + 20 || this.y < -20 || this.y > canvas.height + 20) this.reset(false);
-                }
-                draw() {
-                    for (let i = 1; i < this.trailX.length; i++) {
-                        const a = (this.opacity * (1 - i / this.trailX.length)) * 0.4;
-                        ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = `hsl(${this.hue},100%,70%)`;
-                        ctx.shadowBlur = 8; ctx.shadowColor = `hsl(${this.hue},100%,60%)`;
-                        ctx.beginPath(); ctx.arc(this.trailX[i], this.trailY[i], this.size * (1 - i / this.trailX.length) * 0.8, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-                    }
-                    ctx.save(); ctx.globalAlpha = this.opacity;
-                    const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 5);
-                    g.addColorStop(0, `hsla(${this.hue},100%,75%,0.4)`); g.addColorStop(1, `hsla(${this.hue},100%,75%,0)`);
-                    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(this.x, this.y, this.size * 5, 0, Math.PI * 2); ctx.fill();
-                    ctx.shadowBlur = 20; ctx.shadowColor = `hsl(${this.hue},100%,70%)`;
-                    ctx.fillStyle = `hsl(${this.hue},100%,90%)`; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-                }
+            draw() {
+                ctx.save(); ctx.globalAlpha = this.opacity;
+                ctx.translate(this.x, this.y); ctx.rotate(this.rotation);
+                ctx.fillStyle = this.color;
+                ctx.beginPath(); ctx.ellipse(0, 0, this.size, this.size * 0.55, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
             }
+        }
 
-            class Bee {
-                constructor(i) { this.index = i; this.reset(); }
-                reset() {
-                    this.x = -60; this.baseY = canvas.height * 0.25 + Math.random() * canvas.height * 0.5;
-                    this.y = this.baseY; this.speedX = Math.random() * 1.8 + 1.2;
-                    this.wingAngle = Math.random() * Math.PI * 2; this.bodySize = Math.random() * 3 + 7;
-                    this.phase = Math.random() * Math.PI * 2; this.wobble = Math.random() * 30 + 20;
-                    this.pathFreq = Math.random() * 0.015 + 0.01; this.delay = this.index * 180;
-                }
-                update() {
-                    this.delay = Math.max(0, this.delay - 1); if (this.delay > 0) return;
-                    this.x += this.speedX; this.wingAngle += 0.45;
-                    this.y = this.baseY + Math.sin(this.x * this.pathFreq + this.phase) * this.wobble;
-                    if (this.x > canvas.width + 70) { this.x = -60; this.baseY = canvas.height * 0.25 + Math.random() * canvas.height * 0.5; this.phase = Math.random() * Math.PI * 2; this.speedX = Math.random() * 1.8 + 1.2; }
-                }
-                draw() {
-                    if (this.delay > 0) return;
-                    const { x, y, bodySize: bs, wingAngle } = this; ctx.save(); ctx.translate(x, y);
-                    const wf = Math.abs(Math.sin(wingAngle)), wf2 = Math.abs(Math.sin(wingAngle + 0.8));
-                    ctx.fillStyle = 'rgba(210,230,255,0.72)'; ctx.strokeStyle = 'rgba(100,160,220,0.5)'; ctx.lineWidth = 0.8;
-                    ctx.beginPath(); ctx.ellipse(-bs * 0.7, -bs * 0.7, bs * 0.9, wf * bs * 1.1, -0.4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-                    ctx.beginPath(); ctx.ellipse(bs * 0.7, -bs * 0.7, bs * 0.9, wf2 * bs * 1.1, 0.4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-                    const bg = ctx.createRadialGradient(-bs * 0.2, -bs * 0.3, 0, 0, 0, bs);
-                    bg.addColorStop(0, '#FFE066'); bg.addColorStop(0.5, '#FFB300'); bg.addColorStop(1, '#F57F17');
-                    ctx.fillStyle = bg; ctx.beginPath(); ctx.ellipse(0, 0, bs * 0.6, bs, 0, 0, Math.PI * 2); ctx.fill();
-                    ctx.fillStyle = 'rgba(20,10,0,0.85)';
-                    for (let s = 0; s < 3; s++) { ctx.beginPath(); ctx.ellipse(0, -bs * 0.3 + s * bs * 0.38, bs * 0.5, bs * 0.22, 0, 0, Math.PI * 2); ctx.fill(); }
-                    const hg = ctx.createRadialGradient(-bs * 0.15, -bs * 1.2, 0, 0, -bs * 1.1, bs * 0.55);
-                    hg.addColorStop(0, '#FFF176'); hg.addColorStop(1, '#F9A825');
-                    ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(0, -bs * 1.05, bs * 0.52, 0, Math.PI * 2); ctx.fill();
-                    ctx.fillStyle = '#1a1a1a';
-                    ctx.beginPath(); ctx.arc(-bs * 0.22, -bs * 1.12, bs * 0.14, 0, Math.PI * 2); ctx.fill();
-                    ctx.beginPath(); ctx.arc(bs * 0.22, -bs * 1.12, bs * 0.14, 0, Math.PI * 2); ctx.fill();
-                    ctx.strokeStyle = '#333'; ctx.lineWidth = 1.2;
-                    ctx.beginPath(); ctx.moveTo(-bs * 0.2, -bs * 1.5); ctx.quadraticCurveTo(-bs * 0.8, -bs * 2.3, -bs * 0.6, -bs * 2.6); ctx.stroke();
-                    ctx.beginPath(); ctx.moveTo(bs * 0.2, -bs * 1.5); ctx.quadraticCurveTo(bs * 0.8, -bs * 2.3, bs * 0.6, -bs * 2.6); ctx.stroke();
-                    ctx.fillStyle = '#333';
-                    ctx.beginPath(); ctx.arc(-bs * 0.6, -bs * 2.6, bs * 0.15, 0, Math.PI * 2); ctx.fill();
-                    ctx.beginPath(); ctx.arc(bs * 0.6, -bs * 2.6, bs * 0.15, 0, Math.PI * 2); ctx.fill();
-                    ctx.restore();
-                }
+        // ─── 💫 ESTRELLA FUGAZ ───────────────────────────────────────────────────────
+        class ShootingStar {
+            constructor() { this.active = false; }
+            trigger() {
+                this.active = true; this.x = Math.random() * canvas.width * 0.7; this.y = Math.random() * canvas.height * 0.3;
+                this.len = Math.random() * 100 + 60; this.speed = Math.random() * 14 + 10;
+                this.angle = Math.PI / 4 + (Math.random() - 0.5) * 0.3; this.opacity = 1; this.width = Math.random() * 2 + 1;
             }
-
-            class SunMote {
-                constructor() { this.reset(true); }
-                reset(init) {
-                    this.x = Math.random() * canvas.width; this.y = init ? Math.random() * canvas.height * 0.8 : canvas.height * 0.8;
-                    this.size = Math.random() * 2 + 0.8; this.speedY = -(Math.random() * 0.35 + 0.1);
-                    this.speedX = (Math.random() - 0.5) * 0.25; this.opacity = Math.random() * 0.55 + 0.15;
-                    this.wobbleAmp = Math.random() * 0.3; this.wobbleFreq = Math.random() * 0.02 + 0.01; this.phase = Math.random() * Math.PI * 2;
-                }
-                update() { this.y += this.speedY; this.x += this.speedX + Math.sin(this.y * this.wobbleFreq + this.phase) * this.wobbleAmp; if (this.y < -10) this.reset(false); }
-                draw() {
-                    ctx.save(); ctx.globalAlpha = this.opacity;
-                    const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 3);
-                    g.addColorStop(0, 'rgba(255,253,200,1)'); g.addColorStop(0.5, 'rgba(255,245,150,0.5)'); g.addColorStop(1, 'rgba(255,245,150,0)');
-                    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2); ctx.fill();
-                    ctx.fillStyle = 'rgba(255,255,240,0.9)'; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-                }
+            update() {
+                if (!this.active) return;
+                this.x += Math.cos(this.angle) * this.speed; this.y += Math.sin(this.angle) * this.speed;
+                this.opacity -= 0.018;
+                if (this.opacity <= 0 || this.x > canvas.width || this.y > canvas.height) this.active = false;
             }
-
-            class ShootingStar {
-                constructor() { this.active = false; }
-                trigger() {
-                    this.active = true; this.x = Math.random() * canvas.width * 0.7; this.y = Math.random() * canvas.height * 0.3;
-                    this.len = Math.random() * 100 + 60; this.speed = Math.random() * 14 + 10;
-                    this.angle = Math.PI / 4 + (Math.random() - 0.5) * 0.3; this.opacity = 1; this.width = Math.random() * 2 + 1;
-                }
-                update() {
-                    if (!this.active) return;
-                    this.x += Math.cos(this.angle) * this.speed; this.y += Math.sin(this.angle) * this.speed;
-                    this.opacity -= 0.018;
-                    if (this.opacity <= 0 || this.x > canvas.width || this.y > canvas.height) this.active = false;
-                }
-                draw() {
-                    if (!this.active) return;
-                    ctx.save(); ctx.globalAlpha = this.opacity;
-                    const g = ctx.createLinearGradient(this.x, this.y, this.x - Math.cos(this.angle) * this.len, this.y - Math.sin(this.angle) * this.len);
-                    g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.3, 'rgba(200,220,255,0.6)'); g.addColorStop(1, 'rgba(255,255,255,0)');
-                    ctx.strokeStyle = g; ctx.lineWidth = this.width; ctx.shadowBlur = 12; ctx.shadowColor = '#fff';
-                    ctx.beginPath(); ctx.moveTo(this.x, this.y); ctx.lineTo(this.x - Math.cos(this.angle) * this.len, this.y - Math.sin(this.angle) * this.len); ctx.stroke(); ctx.restore();
-                }
+            draw() {
+                if (!this.active) return;
+                ctx.save(); ctx.globalAlpha = this.opacity;
+                const g = ctx.createLinearGradient(this.x, this.y, this.x - Math.cos(this.angle) * this.len, this.y - Math.sin(this.angle) * this.len);
+                g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.3, 'rgba(200,220,255,0.6)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.strokeStyle = g; ctx.lineWidth = this.width; ctx.shadowBlur = 12; ctx.shadowColor = '#fff';
+                ctx.beginPath(); ctx.moveTo(this.x, this.y); ctx.lineTo(this.x - Math.cos(this.angle) * this.len, this.y - Math.sin(this.angle) * this.len); ctx.stroke(); ctx.restore();
             }
+        }
 
-            class FallingPetal {
-                constructor() { this.reset(true); }
-                reset(init) {
-                    this.x = Math.random() * canvas.width;
-                    this.y = init ? Math.random() * canvas.height * 0.3 : -20;
-                    this.size = Math.random() * 3 + 2;
-                    this.speedY = Math.random() * 0.6 + 0.2;
-                    this.speedX = (Math.random() - 0.5) * 0.4;
-                    this.wobble = Math.random() * 0.05 + 0.02;
-                    this.phase = Math.random() * Math.PI * 2;
-                    this.opacity = Math.random() * 0.6 + 0.2;
-                    this.angle = Math.random() * 360;
-                    this.angleSpeed = (Math.random() - 0.5) * 2;
-                    this.pink = Math.random() > 0.5 ? 'rgba(255,182,193,' : 'rgba(255,228,225,';
-                }
-                update() {
-                    this.y += this.speedY;
-                    this.x += this.speedX + Math.sin(this.y * this.wobble + this.phase) * 0.3;
-                    this.angle += this.angleSpeed;
-                    if (this.y > canvas.height + 20) this.reset(false);
-                }
-                draw() {
-                    ctx.save();
-                    ctx.globalAlpha = this.opacity;
-                    ctx.translate(this.x, this.y);
-                    ctx.rotate((this.angle * Math.PI) / 180);
-                    ctx.fillStyle = this.pink + '0.7)';
-                    ctx.beginPath();
-                    ctx.ellipse(0, 0, this.size * 1.2, this.size * 0.6, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.restore();
-                }
+        // ─── ☀️ MOTA DE SOL ──────────────────────────────────────────────────────────
+        class SunMote {
+            constructor() { this.reset(true); }
+            reset(init) {
+                this.x = Math.random() * canvas.width; this.y = init ? Math.random() * canvas.height * 0.8 : canvas.height * 0.8;
+                this.size = Math.random() * 2 + 0.8; this.speedY = -(Math.random() * 0.35 + 0.1);
+                this.speedX = (Math.random() - 0.5) * 0.25; this.opacity = Math.random() * 0.55 + 0.15;
+                this.wobbleAmp = Math.random() * 0.3; this.wobbleFreq = Math.random() * 0.02 + 0.01; this.phase = Math.random() * Math.PI * 2;
             }
-
-            // ═══ Inicialización de las estrellas fugaces (después de definir la clase) ═══
-            shootingStars = [new ShootingStar(), new ShootingStar(), new ShootingStar()];
-
-            // ═══ Funciones de población del canvas ═══
-            function getCreatureCounts() {
-                const w = window.innerWidth;
-                if (w < 600) return { fireflies: 15, bees: 3, motes: 20, petals: 15 };
-                if (w < 1024) return { fireflies: 22, bees: 5, motes: 28, petals: 25 };
-                return { fireflies: 30, bees: 7, motes: 35, petals: 35 };
+            update() { this.y += this.speedY; this.x += this.speedX + Math.sin(this.y * this.wobbleFreq + this.phase) * this.wobbleAmp; if (this.y < -10) this.reset(false); }
+            draw() {
+                ctx.save(); ctx.globalAlpha = this.opacity;
+                const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 3);
+                g.addColorStop(0, 'rgba(255,253,200,1)'); g.addColorStop(0.5, 'rgba(255,245,150,0.5)'); g.addColorStop(1, 'rgba(255,245,150,0)');
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = 'rgba(255,255,240,0.9)'; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); ctx.restore();
             }
+        }
 
-            function initCreatures() {
-                creatures = [];
-                clearTimeout(shootingStarTimeout);
-                const counts = getCreatureCounts();
-                if (isNightMode) {
-                    for (let i = 0; i < counts.fireflies; i++) creatures.push(new Firefly());
-                    triggerShootingStar();
-                } else {
-                    for (let i = 0; i < counts.bees; i++) creatures.push(new Bee(i));
-                    for (let i = 0; i < counts.motes; i++) creatures.push(new SunMote());
-                    for (let i = 0; i < counts.petals; i++) creatures.push(new FallingPetal());
-                }
+        // ─── INICIALIZACIÓN Y LOOP DE PARTÍCULAS ────────────────────────────────────
+        const shootingStars = [new ShootingStar(), new ShootingStar(), new ShootingStar()];
+        function triggerShootingStar() {
+            if (!isNightMode) return;
+            const a = shootingStars.find(s => !s.active); if (a) a.trigger();
+            shootingStarTimeout = setTimeout(triggerShootingStar, Math.random() * 5000 + 2500);
+        }
+        function initCreatures() {
+            creatures = []; clearTimeout(shootingStarTimeout);
+            if (isNightMode) {
+                for (let i = 0; i < 30; i++) creatures.push(new Firefly());
+                triggerShootingStar(); shootingStars.forEach(s => s.active = false);
+            } else {
+                for (let i = 0; i < 5; i++) creatures.push(new Bee(i));
+                for (let i = 0; i < 6; i++) creatures.push(new Butterfly());
+                for (let i = 0; i < 30; i++) creatures.push(new SunMote());
+                for (let i = 0; i < 18; i++) creatures.push(new FallingPetal());
                 shootingStars.forEach(s => s.active = false);
             }
+        }
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            creatures.forEach(c => { c.update(); c.draw(); });
+            shootingStars.forEach(s => { s.update(); s.draw(); });
+            requestAnimationFrame(animateCanvas);
+        }
+        initCreatures(); animateCanvas();
 
-            function triggerShootingStar() {
-                if (!isNightMode || !isPageVisible) return;
-                const available = shootingStars.find(s => !s.active);
-                if (available) available.trigger();
-                shootingStarTimeout = setTimeout(triggerShootingStar, Math.random() * 5000 + 2500);
+        // ─── ACTUALIZACIÓN PERIÓDICA ─────────────────────────────────────────────────
+        setInterval(() => {
+            const wasNight = isNightMode; isNightMode = setTheme();
+            if (wasNight !== isNightMode) {
+                buildGarden(isNightMode);
+                initCreatures();
+                updateDynamicTitle();
             }
-
-            function animateCanvas() {
-                if (!isPageVisible) {
-                    animFrameId = requestAnimationFrame(animateCanvas);
-                    return;
-                }
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                creatures.forEach(c => { c.update(); c.draw(); });
-                shootingStars.forEach(s => { s.update(); s.draw(); });
-                animFrameId = requestAnimationFrame(animateCanvas);
-            }
-
-            function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                creatures.forEach(c => {
-                    if (c.reset) c.reset(typeof c.trailX !== 'undefined' ? false : true);
-                });
-            }
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
-
-            // ═══ Parallax ═══
-            let parallaxX = 0, parallaxY = 0;
-            function applyParallax() {
-                const factorStars = 0.01;
-                const factorClouds = 0.005;
-                const factorBody = 0.02;
-                starsContainer.style.transform = `translate(${parallaxX * factorStars}px, ${parallaxY * factorStars}px)`;
-                cloudsContainer.style.transform = `translate(${parallaxX * factorClouds}px, ${parallaxY * factorClouds}px)`;
-                celestialBody.style.transform = `translate(${parallaxX * factorBody}px, ${parallaxY * factorBody}px)`;
-            }
-            window.addEventListener('mousemove', (e) => {
-                const centerX = window.innerWidth / 2;
-                const centerY = window.innerHeight / 2;
-                parallaxX = (e.clientX - centerX) * 0.5;
-                parallaxY = (e.clientY - centerY) * 0.5;
-                applyParallax();
-            });
-            window.addEventListener('deviceorientation', (e) => {
-                if (e.gamma !== null && e.beta !== null) {
-                    parallaxX = e.gamma * 2;
-                    parallaxY = (e.beta - 45) * 2;
-                    applyParallax();
-                }
-            });
-
-            // ═══ Visibilidad de página ═══
-            document.addEventListener('visibilitychange', () => {
-                isPageVisible = !document.hidden;
-                if (isPageVisible) {
-                    if (soundEnabled && audioCtx && !ambientOsc) startAmbient();
-                    if (isNightMode) triggerShootingStar();
-                } else {
-                    stopAmbient();
-                    clearTimeout(shootingStarTimeout);
-                    shootingStars.forEach(s => s.active = false);
-                }
-            });
-
-            // ═══ Interacción Flores ═══
-            garden.addEventListener('click', (e) => {
-                const flower = e.target.closest('.flower-wrapper');
-                if (!flower) return;
-                flower.classList.remove('touched');
-                void flower.offsetWidth;
-                flower.classList.add('touched');
-                setTimeout(() => flower.classList.remove('touched'), 500);
-                for (let i = 0; i < 14; i++) {
-                    const s = document.createElement('div');
-                    s.className = 'sparkle';
-                    s.style.left = e.pageX + 'px';
-                    s.style.top = e.pageY + 'px';
-                    s.style.background = sparkleColors[Math.floor(Math.random() * sparkleColors.length)];
-                    s.style.setProperty('--tx', (Math.random() - 0.5) * 130 + 'px');
-                    s.style.setProperty('--ty', (Math.random() - 0.5) * 130 - 40 + 'px');
-                    document.body.appendChild(s);
-                    setTimeout(() => s.remove(), 700);
-                }
-                const msg = getUniqueMessage();
-                const msgEl = document.createElement('div');
-                msgEl.className = 'floating-message';
-                msgEl.textContent = msg;
-                msgEl.style.left = e.pageX + 'px';
-                msgEl.style.top = (e.pageY - 40) + 'px';
-                document.body.appendChild(msgEl);
-                setTimeout(() => msgEl.remove(), 3000);
-                announcer.textContent = msg;
-                playPopSound();
-                if (navigator.vibrate) {
-                    navigator.vibrate(30);
-                }
-            });
-
-            // ═══ Tema y texto dinámico ═══
-            function updateDynamicTitle() {
-                const today = new Date(); today.setHours(0, 0, 0, 0);
-                const hourNow = new Date().getHours();
-                const isNightText = hourNow >= 19 || hourNow < 6;
-                const day1 = new Date(2026, 4, 4);
-                const endDate = new Date(2026, 7, 31);
-                let titleText = '';
-                let subText = '';
-                if (today < day1) {
-                    titleText = "Preparando estadias...";
-                    subText = "Falta muy poco";
-                } else if (today > endDate) {
-                    titleText = "¡Felices estadias!";
-                    subText = "Fue un gran camino";
-                } else if (isNightText) {
-                    titleText = "Espero que te haya sido<br>de maravilla en tu estadía";
-                    subText = "Descansa niña 💤";
-                } else {
-                    let targetDate = new Date(today);
-                    const dow = targetDate.getDay();
-                    let isWeekend = false;
-                    if (dow === 6) { targetDate.setDate(targetDate.getDate() - 1); isWeekend = true; }
-                    else if (dow === 0) { targetDate.setDate(targetDate.getDate() - 2); isWeekend = true; }
-                    let count = 0;
-                    let temp = new Date(day1);
-                    while (temp <= targetDate) {
-                        if (temp.getDay() !== 0 && temp.getDay() !== 6) count++;
-                        temp.setDate(temp.getDate() + 1);
-                    }
-                    const ordinals = { 1: 'er', 2: 'do', 3: 'er' };
-                    const suffix = ordinals[count] || 'to';
-                    titleText = `Feliz ${count}${suffix} día<br>de estadias`;
-                    subText = isWeekend ? "Disfruta tu fin de semana" : "Que te vaya super bien";
-                }
-                titleEl.innerHTML = titleText;
-                subEl.textContent = subText;
-            }
-
-            function setTheme() {
-                const h = new Date().getHours();
-                const night = h >= 19 || h < 6;
-                document.body.className = night ? 'night-mode' : 'day-mode';
-                return night;
-            }
-
-            // ═══ Arranque ═══
-            (function generateStars() {
-                const c = document.getElementById('stars');
-                for (let i = 0; i < 100; i++) {
-                    const s = document.createElement('div');
-                    s.className = 'star';
-                    s.style.left = Math.random() * 100 + '%';
-                    s.style.top = Math.random() * 85 + '%';
-                    const z = Math.random() * 3 + 1;
-                    s.style.width = z + 'px';
-                    s.style.height = z + 'px';
-                    s.style.animationDelay = Math.random() * 3 + 's';
-                    c.appendChild(s);
-                }
-            })();
-
-            isNightMode = setTheme();
-            updateDynamicTitle();
-            buildGarden(isNightMode);
-            initCreatures();
-            animateCanvas();
-            updateSoundIcon();
-
-            document.addEventListener('click', function audioUnlock() {
-                if (!audioCtx) initAudio();
-                document.removeEventListener('click', audioUnlock);
-            }, { once: true });
-
-            setInterval(() => {
-                const wasNight = isNightMode;
-                isNightMode = setTheme();
-                if (wasNight !== isNightMode) {
-                    buildGarden(isNightMode);
-                    initCreatures();
-                    updateDynamicTitle();
-                    stopAmbient();
-                    if (soundEnabled) startAmbient();
-                }
-            }, 60000);
-
-        })();
+        }, 60000);
     </script>
 </body>
 
