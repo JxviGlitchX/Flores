@@ -1,195 +1,467 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Jardín Mágico de Estadias</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@500;700&display=swap"
+        rel="stylesheet">
     <style>
-        :root { --transition-speed: 2s; }
+        :root {
+            --transition-speed: 2s;
+        }
+
         body.night-mode {
-            --sky-top: #0b1026; --sky-mid: #2b1055; --sky-bottom: #7597de;
-            --ground-1: #0a3d0a; --ground-2: #145214; --ground-3: #1e6b1e;
-            --text-main: #ffffff; --text-sub: #d1c4e9;
-            --astro-glow: rgba(255,255,255,0.4); --ambient-light: rgba(138,180,248,0.1);
+            --sky-top: #0b1026;
+            --sky-mid: #2b1055;
+            --sky-bottom: #7597de;
+            --ground-1: #0a3d0a;
+            --ground-2: #145214;
+            --ground-3: #1e6b1e;
+            --text-main: #ffffff;
+            --text-sub: #d1c4e9;
+            --astro-glow: rgba(255, 255, 255, 0.4);
+            --ambient-light: rgba(138, 180, 248, 0.1);
         }
+
         body.day-mode {
-            --sky-top: #2980b9; --sky-mid: #6dd5fa; --sky-bottom: #ffffff;
-            --ground-1: #27ae60; --ground-2: #2ecc71; --ground-3: #82e0aa;
-            --text-main: #2c3e50; --text-sub: #7f8c8d;
-            --astro-glow: rgba(241,196,15,0.6); --ambient-light: rgba(255,255,255,0.3);
+            --sky-top: #2980b9;
+            --sky-mid: #6dd5fa;
+            --sky-bottom: #ffffff;
+            --ground-1: #27ae60;
+            --ground-2: #2ecc71;
+            --ground-3: #82e0aa;
+            --text-main: #2c3e50;
+            --text-sub: #7f8c8d;
+            --astro-glow: rgba(241, 196, 15, 0.6);
+            --ambient-light: rgba(255, 255, 255, 0.3);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            overflow: hidden; height: 100vh; width: 100vw;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
             font-family: 'Quicksand', sans-serif;
             transition: background var(--transition-speed) ease;
             background: linear-gradient(to bottom, var(--sky-top), var(--sky-mid), var(--sky-bottom));
         }
+
         .stars-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 120%; z-index: 1;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120%;
+            z-index: 1;
             transition: opacity var(--transition-speed) ease;
             animation: moveSky 80s linear infinite;
         }
-        body.day-mode .stars-container { opacity: 0; pointer-events: none; }
-        body.night-mode .stars-container { opacity: 1; }
-        @keyframes moveSky { from { transform: translateY(0); } to { transform: translateY(-20%); } }
+
+        body.day-mode .stars-container {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        body.night-mode .stars-container {
+            opacity: 1;
+        }
+
+        @keyframes moveSky {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-20%);
+            }
+        }
+
         .star {
-            position: absolute; background: white; border-radius: 50%;
+            position: absolute;
+            background: white;
+            border-radius: 50%;
             animation: twinkle 3s infinite alternate;
         }
+
         @keyframes twinkle {
-            0% { opacity: 0.3; transform: scale(0.8); }
-            100% { opacity: 1; transform: scale(1.2); }
+            0% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
         }
+
         .celestial-body {
-            position: absolute; top: 8vh; right: 8vw;
-            width: clamp(50px, 12vw, 110px); height: clamp(50px, 12vw, 110px);
-            border-radius: 50%; z-index: 2;
+            position: absolute;
+            top: 8vh;
+            right: 8vw;
+            width: clamp(50px, 12vw, 110px);
+            height: clamp(50px, 12vw, 110px);
+            border-radius: 50%;
+            z-index: 2;
             transition: all var(--transition-speed) ease;
         }
+
         body.night-mode .celestial-body {
             background: radial-gradient(circle at 30% 30%, #fff, #d1d1c1);
-            box-shadow: 0 0 30px var(--astro-glow), 0 0 80px var(--astro-glow), inset -15px -15px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 0 30px var(--astro-glow), 0 0 80px var(--astro-glow), inset -15px -15px 30px rgba(0, 0, 0, 0.2);
         }
+
         body.day-mode .celestial-body {
             background: radial-gradient(circle at 30% 30%, #fff7ae, #f39c12);
             box-shadow: 0 0 50px var(--astro-glow), 0 0 100px var(--astro-glow);
         }
+
         .clouds-container {
-            position: absolute; top: 10vh; width: 200%; height: 100px; z-index: 2;
+            position: absolute;
+            top: 10vh;
+            width: 200%;
+            height: 100px;
+            z-index: 2;
             animation: moveClouds 60s linear infinite;
             transition: opacity var(--transition-speed) ease;
         }
-        body.night-mode .clouds-container { opacity: 0; pointer-events: none; }
-        body.day-mode .clouds-container { opacity: 0.8; }
-        .cloud { position: absolute; background: rgba(255,255,255,0.9); border-radius: 50px; }
-        .cloud::after, .cloud::before { content: ''; position: absolute; background: inherit; border-radius: 50%; }
-        .cloud-1 { width: 120px; height: 40px; top: 20px; left: 10%; }
-        .cloud-1::after { width: 50px; height: 50px; top: -25px; left: 20px; }
-        .cloud-1::before { width: 70px; height: 60px; top: -30px; left: 50px; }
-        .cloud-2 { width: 100px; height: 35px; top: 50px; left: 55%; }
-        .cloud-2::after { width: 45px; height: 45px; top: -20px; left: 15px; }
-        .cloud-2::before { width: 60px; height: 50px; top: -25px; left: 40px; }
-        @keyframes moveClouds { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-        /* SUELO - CAPAS MEJORADAS */
-        .ground-layer { position: absolute; bottom: 0; width: 100%; z-index: 5; transition: background var(--transition-speed) ease; }
-        .ground-back { height: 32vh; background: var(--ground-1); border-radius: 50% 50% 0 0 / 20% 20% 0 0; }
-        .ground-mid { height: 25vh; background: var(--ground-2); border-radius: 60% 40% 0 0 / 30% 20% 0 0; left: -5%; width: 110%; }
-        .ground-front { height: 18vh; background: var(--ground-3); border-radius: 40% 60% 0 0 / 20% 40% 0 0; left: 5%; width: 100%; z-index: 6; }
-        .ambient-glow {
-            position: absolute; bottom: 0; width: 100%; height: 50%;
-            background: radial-gradient(circle at 50% 100%, var(--ambient-light), transparent 70%);
-            z-index: 4; pointer-events: none; transition: background var(--transition-speed) ease;
+        body.night-mode .clouds-container {
+            opacity: 0;
+            pointer-events: none;
         }
 
-        /* MENSAJE */
+        body.day-mode .clouds-container {
+            opacity: 0.8;
+        }
+
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50px;
+        }
+
+        .cloud::after,
+        .cloud::before {
+            content: '';
+            position: absolute;
+            background: inherit;
+            border-radius: 50%;
+        }
+
+        .cloud-1 {
+            width: 120px;
+            height: 40px;
+            top: 20px;
+            left: 10%;
+        }
+
+        .cloud-1::after {
+            width: 50px;
+            height: 50px;
+            top: -25px;
+            left: 20px;
+        }
+
+        .cloud-1::before {
+            width: 70px;
+            height: 60px;
+            top: -30px;
+            left: 50px;
+        }
+
+        .cloud-2 {
+            width: 100px;
+            height: 35px;
+            top: 50px;
+            left: 55%;
+        }
+
+        .cloud-2::after {
+            width: 45px;
+            height: 45px;
+            top: -20px;
+            left: 15px;
+        }
+
+        .cloud-2::before {
+            width: 60px;
+            height: 50px;
+            top: -25px;
+            left: 40px;
+        }
+
+        @keyframes moveClouds {
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(-50%);
+            }
+        }
+
+        .ground-layer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            z-index: 5;
+            transition: background var(--transition-speed) ease;
+        }
+
+        .ground-back {
+            height: 32vh;
+            background: var(--ground-1);
+            border-radius: 50% 50% 0 0 / 20% 20% 0 0;
+        }
+
+        .ground-mid {
+            height: 25vh;
+            background: var(--ground-2);
+            border-radius: 60% 40% 0 0 / 30% 20% 0 0;
+            left: -5%;
+            width: 110%;
+        }
+
+        .ground-front {
+            height: 18vh;
+            background: var(--ground-3);
+            border-radius: 40% 60% 0 0 / 20% 40% 0 0;
+            left: 5%;
+            width: 100%;
+            z-index: 6;
+        }
+
+        .ambient-glow {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50%;
+            background: radial-gradient(circle at 50% 100%, var(--ambient-light), transparent 70%);
+            z-index: 4;
+            pointer-events: none;
+            transition: background var(--transition-speed) ease;
+        }
+
         .mensaje-container {
-            position: absolute; top: 20vh; left: 50%; transform: translateX(-50%);
-            width: 90%; text-align: center; z-index: 20;
+            position: absolute;
+            top: 20vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            text-align: center;
+            z-index: 20;
             animation: fadeInUp 2s ease-out forwards;
         }
+
         .titulo-principal {
             font-family: 'Dancing Script', cursive;
             font-size: clamp(2rem, 7vw, 5rem);
-            color: var(--text-main); line-height: 1.25; margin-bottom: 12px;
-            text-shadow: 0 2px 15px rgba(0,0,0,0.35);
+            color: var(--text-main);
+            line-height: 1.25;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.35);
             transition: color var(--transition-speed) ease;
         }
+
         .subtitulo {
-            font-size: clamp(0.85rem, 3vw, 1.6rem); font-weight: 700;
-            color: var(--text-sub); letter-spacing: 2px; text-transform: uppercase;
+            font-size: clamp(0.85rem, 3vw, 1.6rem);
+            font-weight: 700;
+            color: var(--text-sub);
+            letter-spacing: 2px;
+            text-transform: uppercase;
             transition: color var(--transition-speed) ease;
         }
+
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateX(-50%) translateY(40px); }
-            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
         }
 
-        /* JARDÍN */
         #garden-container {
-            position: absolute; bottom: 0; left: 0;
-            width: 100%; height: 70vh; z-index: 10; pointer-events: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70vh;
+            z-index: 10;
+            pointer-events: none;
         }
 
-        /* FLORES */
         .flower-wrapper {
-            position: absolute; bottom: 0; transform-origin: bottom center;
-            cursor: pointer; pointer-events: all;
+            position: absolute;
+            bottom: 0;
+            transform-origin: bottom center;
+            cursor: pointer;
+            pointer-events: all;
             animation: sway var(--sway-time, 4s) ease-in-out infinite alternate,
-                       growIn 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+                growIn 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
             animation-delay: var(--delay, 0s), var(--delay, 0s);
             will-change: transform;
         }
-        /* CLAVE: overflow visible para que nada se corte */
-        .flower-wrapper svg { overflow: visible; display: block; }
+
+        .flower-wrapper svg {
+            overflow: visible;
+            display: block;
+        }
 
         @keyframes growIn {
-            from { transform: scaleY(0); opacity: 0; transform-origin: bottom center; }
-            to   { transform: scaleY(1); opacity: 1; transform-origin: bottom center; }
+            from {
+                transform: scaleY(0);
+                opacity: 0;
+                transform-origin: bottom center;
+            }
+
+            to {
+                transform: scaleY(1);
+                opacity: 1;
+                transform-origin: bottom center;
+            }
         }
+
         @keyframes sway {
-            0%   { transform: rotate(calc(var(--sway-deg, 4) * -1deg)); }
-            100% { transform: rotate(calc(var(--sway-deg, 4) * 1deg)); }
+            0% {
+                transform: rotate(calc(var(--sway-deg, 4) * -1deg));
+            }
+
+            100% {
+                transform: rotate(calc(var(--sway-deg, 4) * 1deg));
+            }
         }
+
         .flower-wrapper.touched {
             animation: flowerPop 0.4s ease forwards !important;
-            filter: drop-shadow(0 0 12px rgba(255,255,255,0.9));
-        }
-        @keyframes flowerPop {
-            0%   { transform: scale(1) rotate(0); }
-            40%  { transform: scale(1.25) rotate(-5deg); }
-            70%  { transform: scale(0.95) rotate(3deg); }
-            100% { transform: scale(1) rotate(0); }
+            filter: drop-shadow(0 0 14px rgba(255, 255, 255, 0.95));
         }
 
-        /* SPARKLES */
+        @keyframes flowerPop {
+            0% {
+                transform: scale(1) rotate(0);
+            }
+
+            40% {
+                transform: scale(1.28) rotate(-5deg);
+            }
+
+            70% {
+                transform: scale(0.95) rotate(3deg);
+            }
+
+            100% {
+                transform: scale(1) rotate(0);
+            }
+        }
+
         .sparkle {
-            position: absolute; width: 8px; height: 8px; border-radius: 50%;
-            pointer-events: none; z-index: 30;
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 30;
             animation: sparkAnim 0.7s ease-out forwards;
         }
+
         @keyframes sparkAnim {
-            0%   { transform: translate(0,0) scale(1); opacity: 1; }
-            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
         }
 
-        /* MENSAJES FLOTANTES */
         .floating-message {
-            position: absolute; font-family: 'Dancing Script', cursive;
+            position: absolute;
+            font-family: 'Dancing Script', cursive;
             font-size: clamp(1.1rem, 3vw, 1.6rem);
-            color: #ffffff; pointer-events: none; z-index: 40;
-            white-space: nowrap; transform: translateX(-50%);
-            background: rgba(20,20,30,0.65); border-radius: 25px 25px 25px 5px;
+            color: #ffffff;
+            pointer-events: none;
+            z-index: 40;
+            white-space: nowrap;
+            transform: translateX(-50%);
+            background: rgba(20, 20, 30, 0.65);
+            border-radius: 25px 25px 25px 5px;
             padding: 8px 18px;
-            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             animation: floatUp 3s ease-out forwards;
         }
+
         @keyframes floatUp {
-            0%   { transform: translateX(-50%) translateY(0) scale(0.5); opacity: 0; }
-            15%  { transform: translateX(-50%) translateY(-10px) scale(1.05); opacity: 1; }
-            100% { transform: translateX(-50%) translateY(-120px) scale(1); opacity: 0; }
+            0% {
+                transform: translateX(-50%) translateY(0) scale(0.5);
+                opacity: 0;
+            }
+
+            15% {
+                transform: translateX(-50%) translateY(-10px) scale(1.05);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateX(-50%) translateY(-120px) scale(1);
+                opacity: 0;
+            }
         }
 
         #particles-canvas {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%; z-index: 15; pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 15;
+            pointer-events: none;
         }
 
-        /* RESPONSIVE MÓVIL */
         @media (max-width: 600px) {
-            .mensaje-container { top: 16vh; }
-            .titulo-principal { font-size: clamp(1.8rem, 8vw, 3rem); }
-            .subtitulo { font-size: clamp(0.75rem, 3.5vw, 1rem); letter-spacing: 1px; }
-            .floating-message { font-size: 1.1rem; padding: 6px 14px; }
+            .mensaje-container {
+                top: 16vh;
+            }
+
+            .titulo-principal {
+                font-size: clamp(1.8rem, 8vw, 3rem);
+            }
+
+            .subtitulo {
+                font-size: clamp(0.75rem, 3.5vw, 1rem);
+                letter-spacing: 1px;
+            }
+
+            .floating-message {
+                font-size: 1.1rem;
+                padding: 6px 14px;
+            }
         }
+
         @media (max-width: 400px) {
-            .mensaje-container { top: 13vh; }
+            .mensaje-container {
+                top: 13vh;
+            }
         }
     </style>
 </head>
+
 <body class="night-mode">
     <div class="stars-container" id="stars"></div>
     <div class="celestial-body"></div>
@@ -209,461 +481,589 @@
     <canvas id="particles-canvas"></canvas>
 
     <script>
-    // ─── 1. TEXTO DINÁMICO ───────────────────────────────────────────────────
-    function updateDynamicTitle() {
-        const today = new Date(); today.setHours(0,0,0,0);
-        const hourNow = new Date().getHours();
-        const isNightText = hourNow >= 19 || hourNow < 6;
-        const day1 = new Date(2026,4,4);
-        const endDate = new Date(2026,7,31);
-        const titleEl = document.getElementById('title-dynamic');
-        const subEl   = document.getElementById('sub-dynamic');
-        if (today < day1)   { titleEl.innerHTML = "Preparando estadias..."; subEl.textContent = "Falta muy poco"; return; }
-        if (today > endDate){ titleEl.innerHTML = "¡Felices estadias!";     subEl.textContent = "Fue un gran camino"; return; }
-        if (isNightText) {
-            titleEl.innerHTML = "Espero que te haya sido<br>de maravilla en tu estadía";
-            subEl.textContent = "Descansa niña 💤"; return;
+        // ─── TEXTO DINÁMICO ─────────────────────────────────────────────────────────
+        function updateDynamicTitle() {
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const hourNow = new Date().getHours();
+            const isNightText = hourNow >= 19 || hourNow < 6;
+            const day1 = new Date(2026, 4, 4);
+            const endDate = new Date(2026, 7, 31);
+            const titleEl = document.getElementById('title-dynamic');
+            const subEl = document.getElementById('sub-dynamic');
+            if (today < day1) { titleEl.innerHTML = "Preparando estadias..."; subEl.textContent = "Falta muy poco"; return; }
+            if (today > endDate) { titleEl.innerHTML = "¡Felices estadias!"; subEl.textContent = "Fue un gran camino"; return; }
+            if (isNightText) {
+                titleEl.innerHTML = "Espero que te haya sido<br>de maravilla en tu estadía";
+                subEl.textContent = "Descansa niña 💤"; return;
+            }
+            let targetDate = new Date(today); const dow = targetDate.getDay(); let isWeekend = false;
+            if (dow === 6) { targetDate.setDate(targetDate.getDate() - 1); isWeekend = true; }
+            else if (dow === 0) { targetDate.setDate(targetDate.getDate() - 2); isWeekend = true; }
+            let count = 0; let temp = new Date(day1);
+            while (temp <= targetDate) { if (temp.getDay() !== 0 && temp.getDay() !== 6) count++; temp.setDate(temp.getDate() + 1); }
+            let suffix = "to"; if (count === 1) suffix = "er"; else if (count === 2) suffix = "do"; else if (count === 3) suffix = "er";
+            titleEl.innerHTML = `Feliz ${count}${suffix} día<br>de estadias`;
+            subEl.textContent = isWeekend ? "Disfruta tu fin de semana" : "Que te vaya super bien";
         }
-        let targetDate = new Date(today); const dow = targetDate.getDay(); let isWeekend = false;
-        if (dow === 6) { targetDate.setDate(targetDate.getDate()-1); isWeekend = true; }
-        else if (dow === 0) { targetDate.setDate(targetDate.getDate()-2); isWeekend = true; }
-        let count = 0; let temp = new Date(day1);
-        while (temp <= targetDate) { if (temp.getDay()!==0 && temp.getDay()!==6) count++; temp.setDate(temp.getDate()+1); }
-        let suffix = "to"; if(count===1) suffix="er"; else if(count===2) suffix="do"; else if(count===3) suffix="er";
-        titleEl.innerHTML = `Feliz ${count}${suffix} día<br>de estadias`;
-        subEl.textContent = isWeekend ? "Disfruta tu fin de semana" : "Que te vaya super bien";
-    }
-    updateDynamicTitle();
+        updateDynamicTitle();
 
-    // ─── 2. TEMA DÍA/NOCHE ──────────────────────────────────────────────────
-    function setTheme() { const h = new Date().getHours(); const n = h>=19||h<6; document.body.className = n?'night-mode':'day-mode'; return n; }
-    let isNightMode = setTheme();
-
-    // ─── 3. ESTRELLAS ───────────────────────────────────────────────────────
-    function generateStars() {
-        const c = document.getElementById('stars');
-        for (let i=0; i<100; i++) {
-            const s = document.createElement('div'); s.className='star';
-            s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*85+'%';
-            const z = Math.random()*3+1; s.style.width=z+'px'; s.style.height=z+'px';
-            s.style.animationDelay = Math.random()*3+'s'; c.appendChild(s);
+        // ─── TEMA DÍA/NOCHE ─────────────────────────────────────────────────────────
+        function setTheme() {
+            const h = new Date().getHours();
+            const n = h >= 19 || h < 6;
+            document.body.className = n ? 'night-mode' : 'day-mode';
+            return n;
         }
-    }
-    generateStars();
+        let isNightMode = setTheme();
 
-    // ─── 4. FLORES SVG MEJORADAS ────────────────────────────────────────────
-    const garden = document.getElementById('garden-container');
+        // ─── ESTRELLAS ───────────────────────────────────────────────────────────────
+        (function generateStars() {
+            const c = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const s = document.createElement('div'); s.className = 'star';
+                s.style.left = Math.random() * 100 + '%'; s.style.top = Math.random() * 85 + '%';
+                const z = Math.random() * 3 + 1; s.style.width = z + 'px'; s.style.height = z + 'px';
+                s.style.animationDelay = Math.random() * 3 + 's'; c.appendChild(s);
+            }
+        })();
 
-    const flowerPalettes = {
-        daisy: [
-            { petals:'#fff9e6', center:'#FFB300', stem:'#388E3C', leaf1:'#43A047', leaf2:'#2E7D32' },
-            { petals:'#fce4ec', center:'#E91E63', stem:'#388E3C', leaf1:'#43A047', leaf2:'#2E7D32' },
-            { petals:'#e8f5e9', center:'#4CAF50', stem:'#2E7D32', leaf1:'#388E3C', leaf2:'#1B5E20' },
-            { petals:'#ede7f6', center:'#9C27B0', stem:'#388E3C', leaf1:'#43A047', leaf2:'#2E7D32' },
-        ],
-        tulip: [
-            { p1:'#F44336', p2:'#C62828', stem:'#388E3C', leaf:'#43A047' },
-            { p1:'#9C27B0', p2:'#4A148C', stem:'#2E7D32', leaf:'#388E3C' },
-            { p1:'#FF9800', p2:'#E65100', stem:'#388E3C', leaf:'#43A047' },
-            { p1:'#E91E63', p2:'#880E4F', stem:'#2E7D32', leaf:'#388E3C' },
-            { p1:'#3F51B5', p2:'#1A237E', stem:'#388E3C', leaf:'#43A047' },
-        ],
-        rose: [
-            { outer:'#E53935', inner:'#B71C1C', stem:'#388E3C', leaf:'#43A047' },
-            { outer:'#FF4081', inner:'#C51162', stem:'#2E7D32', leaf:'#388E3C' },
-            { outer:'#FF6D00', inner:'#E65100', stem:'#388E3C', leaf:'#43A047' },
-            { outer:'#AB47BC', inner:'#6A1B9A', stem:'#2E7D32', leaf:'#388E3C' },
-        ],
-        sunflower: [
-            { petals:'#FFCA28', center:'#5D4037', hi:'#8D6E63', stem:'#388E3C', leaf:'#43A047' },
-            { petals:'#FFB300', center:'#4E342E', hi:'#795548', stem:'#2E7D32', leaf:'#388E3C' },
-        ]
-    };
+        // ═══════════════════════════════════════════════════════════════════════════
+        //  UTILIDADES
+        // ═══════════════════════════════════════════════════════════════════════════
+        const garden = document.getElementById('garden-container');
+        const STEMS = ['#388E3C', '#2E7D32', '#33691E'];
+        const LEAVES = ['#43A047', '#33691E', '#2E7D32', '#558B2F'];
+        function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        function stem(x1, y1, x2, y2, w) { return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${rnd(STEMS)}" stroke-width="${w}" stroke-linecap="round"/>`; }
+        function leaf(cx, cy, rx, ry, angle) { return `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${rnd(LEAVES)}" transform="rotate(${angle} ${cx} ${cy})"/>`; }
 
-    // ── MARGARITA: tallo desde bottom del SVG hasta la flor ──
-    function makeDaisy(pal, sz) {
-        const S = sz;          // escala
-        const stemH = 65*S;    // altura del tallo en px
-        const flowerR = 22*S;  // radio del centro de la flor
-        const totalH = stemH + flowerR*2.8;  // alto total del SVG
-        const W = flowerR*3.5;
-        // El centro de la flor queda en (0, -flowerR) desde la punta del tallo
-        // El tallo va de (0, 0) abajo hasta (0, -stemH) arriba
-        const cx = 0, cy = -stemH;
-        let petals = '';
-        for (let i=0; i<14; i++) {
-            const a = (360/14)*i;
-            petals += `<ellipse cx="${cx}" cy="${cy-flowerR*1.05}" rx="${4.5*S}" ry="${11*S}"
-                fill="${pal.petals}" opacity="0.97"
+        // ═══════════════════════════════════════════════════════════════════════════
+        //  🌼 GERBERA — pétalos finos definidos, color exacto por paleta
+        // ═══════════════════════════════════════════════════════════════════════════
+        const gerberaPalettes = [
+            { outer: '#ffffff', mid: '#f0f0f0', inner: '#e0e0e0', center: '#FFB300', dot: '#E65100', stroke: '#cccccc' },
+            { outer: '#E53935', mid: '#c62828', inner: '#b71c1c', center: '#FDD835', dot: '#F57F17', stroke: '#b71c1c' },
+            { outer: '#E91E63', mid: '#c2185b', inner: '#ad1457', center: '#FDD835', dot: '#E65100', stroke: '#ad1457' },
+            { outer: '#FF9800', mid: '#f57c00', inner: '#e65100', center: '#FDD835', dot: '#333', stroke: '#e65100' },
+            { outer: '#9C27B0', mid: '#7b1fa2', inner: '#4a148c', center: '#FDD835', dot: '#1a1a1a', stroke: '#4a148c' },
+            { outer: '#FDD835', mid: '#fbc02d', inner: '#f9a825', center: '#E53935', dot: '#333', stroke: '#f9a825' },
+            { outer: '#26C6DA', mid: '#0097A7', inner: '#006064', center: '#FDD835', dot: '#333', stroke: '#006064' },
+        ];
+
+        function makeGerbera(pal, S) {
+            const stemH = 68 * S, R = 26 * S, cx = 0, cy = -stemH;
+            const W = (R + 6) * 2.6, H = stemH + R * 2.8;
+            // 3 coronas: 22 exterior, 14 media, 8 interior — cada una un tono diferente
+            let p = '';
+            // Corona exterior — pétalos finos largos
+            for (let i = 0; i < 22; i++) {
+                const a = (360 / 22) * i;
+                p += `<ellipse cx="${cx}" cy="${cy - R * 0.45}" rx="${3.2 * S}" ry="${R * 0.85}"
+            fill="${pal.outer}" stroke="${pal.stroke}" stroke-width="${0.5 * S}"
+            transform="rotate(${a} ${cx} ${cy})"/>`;
+            }
+            // Corona media — un poco más corta
+            for (let i = 0; i < 14; i++) {
+                const a = (360 / 14) * i + (360 / 44);
+                p += `<ellipse cx="${cx}" cy="${cy - R * 0.38}" rx="${2.8 * S}" ry="${R * 0.62}"
+            fill="${pal.mid}" stroke="${pal.stroke}" stroke-width="${0.4 * S}"
+            transform="rotate(${a} ${cx} ${cy})"/>`;
+            }
+            // Corona interior — más corta y ancha
+            for (let i = 0; i < 8; i++) {
+                const a = (360 / 8) * i + (360 / 16);
+                p += `<ellipse cx="${cx}" cy="${cy - R * 0.25}" rx="${3.5 * S}" ry="${R * 0.38}"
+            fill="${pal.inner}" transform="rotate(${a} ${cx} ${cy})"/>`;
+            }
+            return `<svg width="${W}" height="${H}"
+        viewBox="${-W / 2} ${-(stemH + R * 2.6)} ${W} ${H}"
+        xmlns="http://www.w3.org/2000/svg">
+        ${stem(0, 0, cx, -stemH, 4 * S)}
+        ${leaf(-9 * S, -stemH * 0.42, 13 * S, 4.5 * S, -42)}
+        ${leaf(9 * S, -stemH * 0.68, 13 * S, 4.5 * S, 42)}
+        ${p}
+        <circle cx="${cx}" cy="${cy}" r="${8 * S}" fill="${pal.center}"/>
+        <circle cx="${cx}" cy="${cy}" r="${5 * S}" fill="${pal.dot}"/>
+        <circle cx="${cx}" cy="${cy}" r="${2.5 * S}" fill="${pal.center}" opacity="0.7"/>
+        <circle cx="${cx - 2 * S}" cy="${cy - 2 * S}" r="${1.5 * S}" fill="rgba(255,255,255,0.5)"/>
+    </svg>`;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        //  🌷 TULIPÁN — copa elegante con 5 pétalos bien definidos
+        // ═══════════════════════════════════════════════════════════════════════════
+        const tulipPalettes = [
+            { p1: '#F44336', p2: '#b71c1c', hi: 'rgba(255,180,180,0.3)' },
+            { p1: '#9C27B0', p2: '#4A148C', hi: 'rgba(206,147,216,0.3)' },
+            { p1: '#FF9800', p2: '#E65100', hi: 'rgba(255,224,130,0.3)' },
+            { p1: '#E91E63', p2: '#880E4F', hi: 'rgba(244,143,177,0.3)' },
+            { p1: '#ECEFF1', p2: '#90A4AE', hi: 'rgba(255,255,255,0.5)' },
+            { p1: '#FDD835', p2: '#F57F17', hi: 'rgba(255,248,160,0.3)' },
+            { p1: '#E040FB', p2: '#7B1FA2', hi: 'rgba(234,128,252,0.3)' },
+        ];
+
+        function makeTulip(pal, S) {
+            const stemH = 80 * S, fw = 22 * S, fh = 34 * S, cx = 0, cy = -stemH;
+            const W = 68 * S, H = stemH + fh + 10 * S;
+            return `<svg width="${W}" height="${H}"
+        viewBox="${-W / 2} ${-(stemH + fh + 10 * S)} ${W} ${H}"
+        xmlns="http://www.w3.org/2000/svg">
+        ${stem(0, 0, 0, -stemH, 4.5 * S)}
+        ${leaf(-12 * S, -stemH * 0.42, 15 * S, 5 * S, -38)}
+        ${leaf(12 * S, -stemH * 0.68, 15 * S, 5 * S, 38)}
+        <!-- sépalo verde -->
+        <ellipse cx="${cx}" cy="${cy + 5 * S}" rx="${fw * 0.85}" ry="${4.5 * S}" fill="#388E3C"/>
+        <!-- 2 pétalos traseros oscuros -->
+        <ellipse cx="${cx - fw * 0.52}" cy="${cy - fh * 0.3}" rx="${fw * 0.58}" ry="${fh * 0.88}"
+            fill="${pal.p2}" transform="rotate(-16 ${cx - fw * 0.52} ${cy - fh * 0.3})"/>
+        <ellipse cx="${cx + fw * 0.52}" cy="${cy - fh * 0.3}" rx="${fw * 0.58}" ry="${fh * 0.88}"
+            fill="${pal.p2}" transform="rotate(16 ${cx + fw * 0.52} ${cy - fh * 0.3})"/>
+        <!-- 2 pétalos laterales -->
+        <ellipse cx="${cx - fw * 0.9}" cy="${cy - fh * 0.38}" rx="${fw * 0.52}" ry="${fh * 0.82}"
+            fill="${pal.p1}" transform="rotate(-28 ${cx - fw * 0.9} ${cy - fh * 0.38})"/>
+        <ellipse cx="${cx + fw * 0.9}" cy="${cy - fh * 0.38}" rx="${fw * 0.52}" ry="${fh * 0.82}"
+            fill="${pal.p1}" transform="rotate(28 ${cx + fw * 0.9} ${cy - fh * 0.38})"/>
+        <!-- pétalo central frontal -->
+        <ellipse cx="${cx}" cy="${cy - fh * 0.44}" rx="${fw * 0.65}" ry="${fh * 0.94}" fill="${pal.p1}"/>
+        <!-- vena central -->
+        <line x1="${cx}" y1="${cy - 2 * S}" x2="${cx}" y2="${cy - fh * 0.88}"
+            stroke="${pal.p2}" stroke-width="${1.8 * S}" stroke-linecap="round" opacity="0.4"/>
+        <!-- brillo -->
+        <ellipse cx="${cx - fw * 0.2}" cy="${cy - fh * 0.6}" rx="${3.5 * S}" ry="${8 * S}"
+            fill="${pal.hi}" transform="rotate(-8 ${cx - fw * 0.2} ${cy - fh * 0.6})"/>
+    </svg>`;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        //  🌸 FLOR DE LOTO — capas de pétalos curvadas, ideal NOCHE
+        // ═══════════════════════════════════════════════════════════════════════════
+        const lotusPalettes = [
+            { p1: '#f8bbd0', p2: '#f48fb1', p3: '#e91e63', center: '#fffde7', lf: '#1b5e20' },
+            { p1: '#e1bee7', p2: '#ce93d8', p3: '#9c27b0', center: '#fffde7', lf: '#1b5e20' },
+            { p1: '#ffffff', p2: '#f5f5f5', p3: '#e0e0e0', center: '#fff176', lf: '#2e7d32' },
+            { p1: '#b3e5fc', p2: '#4fc3f7', p3: '#0288d1', center: '#fff9c4', lf: '#1b5e20' },
+        ];
+
+        function makeLotus(pal, S) {
+            const stemH = 72 * S, cx = 0, cy = -stemH;
+            const W = 78 * S, H = stemH + 56 * S;
+            let ext = '', mid = '', inn = '';
+            for (let i = 0; i < 8; i++) {
+                const a = (360 / 8) * i;
+                ext += `<ellipse cx="${cx}" cy="${cy - 22 * S}" rx="${6.5 * S}" ry="${20 * S}"
+            fill="${pal.p1}" stroke="${pal.p2}" stroke-width="${0.7 * S}"
+            transform="rotate(${a} ${cx} ${cy}) translate(0 ${3 * S})"/>`;
+            }
+            for (let i = 0; i < 6; i++) {
+                const a = (360 / 6) * i + 20;
+                mid += `<ellipse cx="${cx}" cy="${cy - 16 * S}" rx="${6 * S}" ry="${17 * S}"
+            fill="${pal.p2}" stroke="${pal.p3}" stroke-width="${0.6 * S}"
+            transform="rotate(${a} ${cx} ${cy})"/>`;
+            }
+            for (let i = 0; i < 4; i++) {
+                const a = (360 / 4) * i + 8;
+                inn += `<ellipse cx="${cx}" cy="${cy - 11 * S}" rx="${5 * S}" ry="${12 * S}"
+            fill="${pal.p3}" transform="rotate(${a} ${cx} ${cy})"/>`;
+            }
+            return `<svg width="${W}" height="${H}"
+        viewBox="${-W / 2} ${-(stemH + 54 * S)} ${W} ${H}"
+        xmlns="http://www.w3.org/2000/svg">
+        <path d="M 0 0 Q ${-7 * S} ${-stemH * 0.5} 0 ${-stemH}"
+            stroke="${rnd(STEMS)}" stroke-width="${4 * S}" fill="none" stroke-linecap="round"/>
+        <ellipse cx="${-15 * S}" cy="${-stemH * 0.28}" rx="${19 * S}" ry="${10 * S}"
+            fill="${pal.lf}" opacity="0.88"/>
+        <ellipse cx="${13 * S}" cy="${-stemH * 0.54}" rx="${14 * S}" ry="${8 * S}"
+            fill="${pal.lf}" opacity="0.72"/>
+        ${ext}${mid}${inn}
+        <circle cx="${cx}" cy="${cy}" r="${8 * S}" fill="${pal.center}"/>
+        <circle cx="${cx}" cy="${cy}" r="${4.5 * S}" fill="#f9a825"/>
+        <circle cx="${cx - 1.5 * S}" cy="${cy - 1.5 * S}" r="${1.8 * S}" fill="rgba(255,255,255,0.5)"/>
+    </svg>`;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        //  🌺 ORQUÍDEA — asimétrica y elegante, ideal NOCHE
+        // ═══════════════════════════════════════════════════════════════════════════
+        const orchidPalettes = [
+            { bg: '#ce93d8', accent: '#7b1fa2', lip: '#fff9c4', lipA: '#9c27b0', vein: '#6a1b9a' },
+            { bg: '#ffffff', accent: '#e0e0e0', lip: '#e91e63', lipA: '#ad1457', vein: '#880e4f' },
+            { bg: '#f48fb1', accent: '#c2185b', lip: '#fff176', lipA: '#f57f17', vein: '#880e4f' },
+            { bg: '#b39ddb', accent: '#4527a0', lip: '#fffde7', lipA: '#fbc02d', vein: '#311b92' },
+            { bg: '#80deea', accent: '#00838f', lip: '#ffffff', lipA: '#0097a7', vein: '#006064' },
+        ];
+
+        function makeOrchid(pal, S) {
+            const stemH = 88 * S, cx = 0, cy = -stemH;
+            const W = 82 * S, H = stemH + 52 * S;
+            return `<svg width="${W}" height="${H}"
+        viewBox="${-W / 2} ${-(stemH + 50 * S)} ${W} ${H}"
+        xmlns="http://www.w3.org/2000/svg">
+        <path d="M 0 0 C ${5 * S} ${-stemH * 0.3} ${-5 * S} ${-stemH * 0.7} 0 ${-stemH}"
+            stroke="${rnd(STEMS)}" stroke-width="${3.5 * S}" fill="none" stroke-linecap="round"/>
+        ${leaf(-14 * S, -stemH * 0.32, 17 * S, 5.5 * S, -35)}
+        ${leaf(14 * S, -stemH * 0.58, 17 * S, 5.5 * S, 35)}
+        <!-- sépalos traseros (3) -->
+        <ellipse cx="${cx}" cy="${cy - 22 * S}" rx="${5 * S}" ry="${22 * S}" fill="${pal.accent}" opacity="0.82"/>
+        <ellipse cx="${cx - 17 * S}" cy="${cy - 10 * S}" rx="${5 * S}" ry="${18 * S}"
+            fill="${pal.accent}" opacity="0.82" transform="rotate(-48 ${cx - 17 * S} ${cy - 10 * S})"/>
+        <ellipse cx="${cx + 17 * S}" cy="${cy - 10 * S}" rx="${5 * S}" ry="${18 * S}"
+            fill="${pal.accent}" opacity="0.82" transform="rotate(48 ${cx + 17 * S} ${cy - 10 * S})"/>
+        <!-- pétalos laterales grandes -->
+        <ellipse cx="${cx - 20 * S}" cy="${cy - 7 * S}" rx="${19 * S}" ry="${10 * S}"
+            fill="${pal.bg}" stroke="${pal.vein}" stroke-width="${0.7 * S}"
+            transform="rotate(-14 ${cx - 20 * S} ${cy - 7 * S})"/>
+        <ellipse cx="${cx + 20 * S}" cy="${cy - 7 * S}" rx="${19 * S}" ry="${10 * S}"
+            fill="${pal.bg}" stroke="${pal.vein}" stroke-width="${0.7 * S}"
+            transform="rotate(14 ${cx + 20 * S} ${cy - 7 * S})"/>
+        <!-- venas en pétalos -->
+        <line x1="${cx - 28 * S}" y1="${cy - 4 * S}" x2="${cx - 8 * S}" y2="${cy - 10 * S}"
+            stroke="${pal.vein}" stroke-width="${0.8 * S}" opacity="0.4" stroke-linecap="round"/>
+        <line x1="${cx + 28 * S}" y1="${cy - 4 * S}" x2="${cx + 8 * S}" y2="${cy - 10 * S}"
+            stroke="${pal.vein}" stroke-width="${0.8 * S}" opacity="0.4" stroke-linecap="round"/>
+        <!-- labelo especial -->
+        <ellipse cx="${cx}" cy="${cy + 11 * S}" rx="${13 * S}" ry="${14 * S}"
+            fill="${pal.lip}" stroke="${pal.lipA}" stroke-width="${1.2 * S}"/>
+        <ellipse cx="${cx}" cy="${cy + 13 * S}" rx="${7 * S}" ry="${7.5 * S}"
+            fill="${pal.lipA}" opacity="0.3"/>
+        <line x1="${cx}" y1="${cy + 2 * S}" x2="${cx}" y2="${cy + 22 * S}"
+            stroke="${pal.lipA}" stroke-width="${1.2 * S}" stroke-linecap="round" opacity="0.45"/>
+        <!-- columna -->
+        <ellipse cx="${cx}" cy="${cy - 2 * S}" rx="${5 * S}" ry="${8 * S}" fill="${pal.bg}"/>
+        <circle cx="${cx}" cy="${cy - 6 * S}" r="${3.5 * S}" fill="${pal.lip}"/>
+        <!-- puntos decorativos labelo -->
+        <circle cx="${cx - 4 * S}" cy="${cy + 15 * S}" r="${1.8 * S}" fill="${pal.lipA}" opacity="0.6"/>
+        <circle cx="${cx + 4 * S}" cy="${cy + 15 * S}" r="${1.8 * S}" fill="${pal.lipA}" opacity="0.6"/>
+        <circle cx="${cx}" cy="${cy + 20 * S}" r="${1.4 * S}" fill="${pal.lipA}" opacity="0.4"/>
+    </svg>`;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        //  🌸 PEONÍA — densa y voluminosa, ideal DÍA
+        // ═══════════════════════════════════════════════════════════════════════════
+        const paeonyPalettes = [
+            { p1: '#f8bbd0', p2: '#f48fb1', p3: '#e91e63', p4: '#c2185b', center: '#fffde7' },
+            { p1: '#ffccbc', p2: '#ff8a65', p3: '#f4511e', p4: '#bf360c', center: '#fff176' },
+            { p1: '#ffffff', p2: '#fce4ec', p3: '#f48fb1', p4: '#e91e63', center: '#fffde7' },
+            { p1: '#e1bee7', p2: '#ce93d8', p3: '#ab47bc', p4: '#6a1b9a', center: '#fff9c4' },
+            { p1: '#ffe082', p2: '#ffd54f', p3: '#ffc107', p4: '#f57f17', center: '#fff176' },
+        ];
+
+        function makePaeony(pal, S) {
+            const stemH = 72 * S, cx = 0, cy = -stemH;
+            const W = 88 * S, H = stemH + 54 * S;
+            const layers = [
+                { n: 12, ry: 27 * S, rx: 9 * S, fill: pal.p1, rot: 0 },
+                { n: 10, ry: 22 * S, rx: 8 * S, fill: pal.p2, rot: 18 },
+                { n: 8, ry: 17 * S, rx: 7 * S, fill: pal.p3, rot: 8 },
+                { n: 6, ry: 12 * S, rx: 5.5 * S, fill: pal.p4, rot: 22 },
+            ];
+            let p = '';
+            for (const L of layers) {
+                for (let i = 0; i < L.n; i++) {
+                    const a = (360 / L.n) * i + L.rot;
+                    p += `<ellipse cx="${cx}" cy="${cy - L.ry * 0.42}" rx="${L.rx}" ry="${L.ry}"
+                fill="${L.fill}" stroke="rgba(0,0,0,0.05)" stroke-width="${0.5 * S}"
                 transform="rotate(${a} ${cx} ${cy})"/>`;
+                }
+            }
+            return `<svg width="${W}" height="${H}"
+        viewBox="${-W / 2} ${-(stemH + 52 * S)} ${W} ${H}"
+        xmlns="http://www.w3.org/2000/svg">
+        ${stem(0, 0, 0, -stemH, 5 * S)}
+        ${leaf(-13 * S, -stemH * 0.38, 17 * S, 5.5 * S, -40)}
+        ${leaf(13 * S, -stemH * 0.62, 17 * S, 5.5 * S, 40)}
+        ${p}
+        <circle cx="${cx}" cy="${cy}" r="${9 * S}" fill="${pal.center}"/>
+        <circle cx="${cx}" cy="${cy}" r="${5 * S}" fill="#f9a825" opacity="0.85"/>
+        <circle cx="${cx - 3 * S}" cy="${cy - 4 * S}" r="${1.8 * S}" fill="#f57f17"/>
+        <circle cx="${cx + 3 * S}" cy="${cy - 3 * S}" r="${1.8 * S}" fill="#f57f17"/>
+        <circle cx="${cx}" cy="${cy - 5.5 * S}" r="${1.8 * S}" fill="#f57f17"/>
+        <circle cx="${cx - 1.5 * S}" cy="${cy - 1.5 * S}" r="${2.2 * S}" fill="rgba(255,255,255,0.38)"/>
+    </svg>`;
         }
-        return `<svg width="${W}" height="${totalH}"
-            viewBox="${-W/2} ${-(stemH+flowerR*2.5)} ${W} ${totalH}"
-            xmlns="http://www.w3.org/2000/svg">
-            <line x1="${cx}" y1="0" x2="${cx}" y2="${-stemH}"
-                stroke="${pal.stem}" stroke-width="${4*S}" stroke-linecap="round"/>
-            <ellipse cx="${-8*S}" cy="${-stemH*0.45}" rx="${10*S}" ry="${4.5*S}"
-                fill="${pal.leaf1}" transform="rotate(-40 ${-8*S} ${-stemH*0.45})"/>
-            <ellipse cx="${8*S}" cy="${-stemH*0.68}" rx="${10*S}" ry="${4.5*S}"
-                fill="${pal.leaf2}" transform="rotate(40 ${8*S} ${-stemH*0.68})"/>
-            ${petals}
-            <circle cx="${cx}" cy="${cy}" r="${7*S}" fill="${pal.center}"/>
-            <circle cx="${cx-2*S}" cy="${cy-2*S}" r="${2.5*S}" fill="rgba(255,255,255,0.3)"/>
-        </svg>`;
-    }
 
-    // ── TULIPÁN ──
-    function makeTulip(pal, sz) {
-        const S = sz;
-        const stemH = 75*S;
-        const fw = 22*S, fh = 28*S;
-        const totalH = stemH + fh + 5*S;
-        const W = fw*2.5;
-        const cx = 0, cy = -stemH;
-        return `<svg width="${W}" height="${totalH}"
-            viewBox="${-W/2} ${-(stemH+fh+5*S)} ${W} ${totalH}"
-            xmlns="http://www.w3.org/2000/svg">
-            <line x1="0" y1="0" x2="0" y2="${-stemH}"
-                stroke="${pal.stem}" stroke-width="${4*S}" stroke-linecap="round"/>
-            <ellipse cx="${-9*S}" cy="${-stemH*0.5}" rx="${12*S}" ry="${4*S}"
-                fill="${pal.leaf}" transform="rotate(-38 ${-9*S} ${-stemH*0.5})"/>
-            <ellipse cx="${9*S}" cy="${-stemH*0.72}" rx="${12*S}" ry="${4*S}"
-                fill="${pal.leaf}" transform="rotate(38 ${9*S} ${-stemH*0.72})"/>
-            <!-- pétalos exteriores -->
-            <ellipse cx="${cx-7*S}" cy="${cy-fh*0.2}" rx="${10*S}" ry="${fh*0.9}" fill="${pal.p1}"
-                transform="rotate(-12 ${cx-7*S} ${cy-fh*0.2})"/>
-            <ellipse cx="${cx+7*S}" cy="${cy-fh*0.2}" rx="${10*S}" ry="${fh*0.9}" fill="${pal.p1}"
-                transform="rotate(12 ${cx+7*S} ${cy-fh*0.2})"/>
-            <ellipse cx="${cx}" cy="${cy-fh*0.35}" rx="${fw*0.6}" ry="${fh}" fill="${pal.p1}"/>
-            <!-- interior más oscuro -->
-            <ellipse cx="${cx}" cy="${cy-fh*0.25}" rx="${fw*0.38}" ry="${fh*0.72}" fill="${pal.p2}"/>
-            <!-- brillo -->
-            <ellipse cx="${cx-4*S}" cy="${cy-fh*0.55}" rx="${3*S}" ry="${6*S}"
-                fill="rgba(255,255,255,0.22)" transform="rotate(-8 ${cx-4*S} ${cy-fh*0.55})"/>
-        </svg>`;
-    }
+        // ═══════════════════════════════════════════════════════════════════════════
+        //  🌻 GIRASOL — 2 coronas, centro texturizado, ideal DÍA
+        // ═══════════════════════════════════════════════════════════════════════════
+        const sunflowerPalettes = [
+            { p1: '#FFCA28', p2: '#FFB300', center: '#4E342E', hi: '#795548' },
+            { p1: '#FFD740', p2: '#FFA000', center: '#3E2723', hi: '#6D4C41' },
+        ];
 
-    // ── ROSA ──
-    function makeRose(pal, sz) {
-        const S = sz;
-        const stemH = 72*S;
-        const fr = 20*S;
-        const totalH = stemH + fr*2.5;
-        const W = fr*3;
-        const cx = 0, cy = -stemH;
-        return `<svg width="${W}" height="${totalH}"
-            viewBox="${-W/2} ${-(stemH+fr*2.2)} ${W} ${totalH}"
-            xmlns="http://www.w3.org/2000/svg">
-            <line x1="0" y1="0" x2="0" y2="${-stemH}"
-                stroke="${pal.stem}" stroke-width="${4*S}" stroke-linecap="round"/>
-            <!-- espinas pequeñas -->
-            <line x1="${-2*S}" y1="${-stemH*0.35}" x2="${-7*S}" y2="${-stemH*0.4}"
-                stroke="${pal.stem}" stroke-width="${1.5*S}" stroke-linecap="round"/>
-            <ellipse cx="${-9*S}" cy="${-stemH*0.55}" rx="${12*S}" ry="${4*S}"
-                fill="${pal.leaf}" transform="rotate(-38 ${-9*S} ${-stemH*0.55})"/>
-            <ellipse cx="${9*S}" cy="${-stemH*0.75}" rx="${12*S}" ry="${4*S}"
-                fill="${pal.leaf}" transform="rotate(38 ${9*S} ${-stemH*0.75})"/>
-            <!-- sépalos -->
-            <ellipse cx="${cx}" cy="${cy+fr*0.2}" rx="${fr*1.15}" ry="${fr*0.32}" fill="#388E3C"/>
-            <!-- pétalos externos -->
-            <circle cx="${cx}" cy="${cy}" r="${fr}" fill="${pal.outer}"/>
-            <!-- pétalos medios -->
-            <ellipse cx="${cx-fr*0.2}" cy="${cy-fr*0.1}" rx="${fr*0.75}" ry="${fr*0.72}"
-                fill="${pal.outer}"/>
-            <ellipse cx="${cx+fr*0.2}" cy="${cy-fr*0.1}" rx="${fr*0.75}" ry="${fr*0.72}"
-                fill="${pal.outer}"/>
-            <!-- centro espiral -->
-            <circle cx="${cx}" cy="${cy}" r="${fr*0.5}" fill="${pal.inner}"/>
-            <ellipse cx="${cx-fr*0.12}" cy="${cy-fr*0.12}" rx="${fr*0.28}" ry="${fr*0.35}"
-                fill="${pal.inner}" transform="rotate(-25 ${cx-fr*0.12} ${cy-fr*0.12})"/>
-            <circle cx="${cx}" cy="${cy}" r="${fr*0.2}" fill="${pal.outer}"/>
-            <!-- brillo -->
-            <circle cx="${cx-fr*0.28}" cy="${cy-fr*0.28}" r="${fr*0.12}"
-                fill="rgba(255,255,255,0.3)"/>
-        </svg>`;
-    }
-
-    // ── GIRASOL ──
-    function makeSunflower(pal, sz) {
-        const S = sz;
-        const stemH = 85*S;
-        const fr = 18*S;
-        const totalH = stemH + fr*3;
-        const W = fr*4;
-        const cx = 0, cy = -stemH;
-        let petals = '';
-        for (let i=0; i<16; i++) {
-            const a = i*(360/16);
-            petals += `<ellipse cx="${cx}" cy="${cy-fr*1.6}" rx="${5*S}" ry="${15*S}"
-                fill="${pal.petals}" transform="rotate(${a} ${cx} ${cy})"/>`;
+        function makeSunflower(pal, S) {
+            const stemH = 90 * S, cx = 0, cy = -stemH;
+            const W = 92 * S, H = stemH + 56 * S, fr = 21 * S;
+            let outer = '', inner = '';
+            for (let i = 0; i < 16; i++) {
+                outer += `<ellipse cx="${cx}" cy="${cy - fr * 1.68}" rx="${5.5 * S}" ry="${17 * S}"
+            fill="${pal.p1}" transform="rotate(${i * 22.5} ${cx} ${cy})"/>`;
+            }
+            for (let i = 0; i < 12; i++) {
+                inner += `<ellipse cx="${cx}" cy="${cy - fr * 1.22}" rx="${4 * S}" ry="${12 * S}"
+            fill="${pal.p2}" transform="rotate(${i * 30 + 11} ${cx} ${cy})"/>`;
+            }
+            return `<svg width="${W}" height="${H}"
+        viewBox="${-W / 2} ${-(stemH + 54 * S)} ${W} ${H}"
+        xmlns="http://www.w3.org/2000/svg">
+        ${stem(0, 0, 0, -stemH, 5.5 * S)}
+        ${leaf(-14 * S, -stemH * 0.36, 19 * S, 6.5 * S, -42)}
+        ${leaf(14 * S, -stemH * 0.6, 19 * S, 6.5 * S, 42)}
+        ${outer}${inner}
+        <circle cx="${cx}" cy="${cy}" r="${fr}" fill="${pal.center}"/>
+        <circle cx="${cx}" cy="${cy}" r="${fr * 0.72}" fill="${pal.hi}"/>
+        <circle cx="${cx}" cy="${cy}" r="${fr * 0.44}" fill="${pal.center}"/>
+        <circle cx="${cx - 5 * S}" cy="${cy - 5 * S}" r="${2.2 * S}" fill="${pal.hi}" opacity="0.65"/>
+        <circle cx="${cx + 5 * S}" cy="${cy - 3 * S}" r="${2.2 * S}" fill="${pal.hi}" opacity="0.65"/>
+        <circle cx="${cx}" cy="${cy + 6 * S}" r="${2.2 * S}" fill="${pal.hi}" opacity="0.65"/>
+        <circle cx="${cx - 1.5 * S}" cy="${cy - 1.5 * S}" r="${2 * S}" fill="rgba(255,255,255,0.2)"/>
+    </svg>`;
         }
-        return `<svg width="${W}" height="${totalH}"
-            viewBox="${-W/2} ${-(stemH+fr*2.8)} ${W} ${totalH}"
-            xmlns="http://www.w3.org/2000/svg">
-            <line x1="0" y1="0" x2="0" y2="${-stemH}"
-                stroke="${pal.stem}" stroke-width="${5*S}" stroke-linecap="round"/>
-            <ellipse cx="${-10*S}" cy="${-stemH*0.4}" rx="${14*S}" ry="${5*S}"
-                fill="#43A047" transform="rotate(-42 ${-10*S} ${-stemH*0.4})"/>
-            <ellipse cx="${10*S}" cy="${-stemH*0.62}" rx="${14*S}" ry="${5*S}"
-                fill="#2E7D32" transform="rotate(42 ${10*S} ${-stemH*0.62})"/>
-            ${petals}
-            <circle cx="${cx}" cy="${cy}" r="${fr}" fill="${pal.center}"/>
-            <!-- textura centro -->
-            <circle cx="${cx}" cy="${cy}" r="${fr*0.75}" fill="${pal.hi}"/>
-            <circle cx="${cx}" cy="${cy}" r="${fr*0.5}" fill="${pal.center}"/>
-            <circle cx="${cx-fr*0.2}" cy="${cy-fr*0.2}" r="${fr*0.15}"
-                fill="rgba(255,255,255,0.15)"/>
-        </svg>`;
-    }
 
-    function spawnFlower(layer) {
-        let sizeBase, opacity, zIdx, bottomPct;
-        if (layer==='back')  { sizeBase=Math.random()*0.22+0.32; opacity=0.6;  zIdx=7; bottomPct=Math.random()*18+28; }
-        else if (layer==='mid') { sizeBase=Math.random()*0.22+0.55; opacity=0.85; zIdx=8; bottomPct=Math.random()*12+16; }
-        else                 { sizeBase=Math.random()*0.28+0.78; opacity=1;    zIdx=9; bottomPct=Math.random()*8+6; }
-
-        const types=['daisy','tulip','rose','sunflower'];
-        const type = types[Math.floor(Math.random()*types.length)];
-        const pal  = flowerPalettes[type][Math.floor(Math.random()*flowerPalettes[type].length)];
-
-        let svgContent;
-        if (type==='daisy')     svgContent=makeDaisy(pal,sizeBase);
-        else if(type==='tulip') svgContent=makeTulip(pal,sizeBase);
-        else if(type==='rose')  svgContent=makeRose(pal,sizeBase);
-        else                    svgContent=makeSunflower(pal,sizeBase);
-
-        const wrapper = document.createElement('div');
-        wrapper.className='flower-wrapper';
-        wrapper.innerHTML=svgContent;
-        wrapper.style.left=(Math.random()*86+4)+'%';
-        wrapper.style.bottom=bottomPct+'%';
-        wrapper.style.opacity=opacity;
-        wrapper.style.zIndex=zIdx;
-        wrapper.style.setProperty('--delay',(Math.random()*2.5)+'s');
-        wrapper.style.setProperty('--sway-time',(Math.random()*3+3.5)+'s');
-        wrapper.style.setProperty('--sway-deg',(Math.random()*6+2));
-        if (isNightMode) wrapper.style.filter='drop-shadow(0 0 5px rgba(200,200,255,0.28))';
-        garden.appendChild(wrapper);
-    }
-
-    for(let i=0;i<10;i++) spawnFlower('back');
-    for(let i=0;i<14;i++) spawnFlower('mid');
-    for(let i=0;i<10;i++) spawnFlower('front');
-
-    // ─── 5. INTERACCIÓN CON FLORES ──────────────────────────────────────────
-    const sparkleColors=['#ffeb3b','#ff4081','#4caf50','#00e5ff','#ffffff','#ff9800','#ce93d8'];
-    const loveMessages=[
-        "Qué hermosa te quiero ❤️","Eres la mejor 🌹","Me encantan tus ojos",
-        "Tus ojos brillan más que las estrellas ✨","Me pierdo en tu mirada",
-        "Tu pelo está increíble 💇‍♀️","Me encanta tu cabello","Tu sonrisa me alegra el día",
-        "Me haces muy feliz","Eres especial para mí","Contigo todo es mejor",
-        "Qué suerte tenerte","Me encantas mucho","Eres luz en mi día",
-        "Eres mi persona favorita","Te pienso todo el día",
-        "Eres un sueño hecho realidad","Eres única y especial",
-        "Contigo todo es mágico","Eres la mejor compañía 🌸"
-    ];
-    garden.addEventListener('click',(e)=>{
-        const flower=e.target.closest('.flower-wrapper');
-        if(!flower) return;
-        flower.classList.remove('touched');
-        void flower.offsetWidth;
-        flower.classList.add('touched');
-        setTimeout(()=>flower.classList.remove('touched'),500);
-        for(let i=0;i<14;i++){
-            const s=document.createElement('div'); s.className='sparkle';
-            s.style.left=e.pageX+'px'; s.style.top=e.pageY+'px';
-            s.style.background=sparkleColors[Math.floor(Math.random()*sparkleColors.length)];
-            s.style.setProperty('--tx',(Math.random()-0.5)*120+'px');
-            s.style.setProperty('--ty',(Math.random()-0.5)*120-40+'px');
-            document.body.appendChild(s);
-            setTimeout(()=>s.remove(),700);
+        // ═══════════════════════════════════════════════════════════════════════════
+        //  SELECCIÓN FLORES POR MODO
+        //  Día:   Girasol, Peonía, Gerbera, Tulipán  → vivos y alegres
+        //  Noche: Loto, Orquídea, Gerbera, Tulipán   → elegantes y luminosas
+        // ═══════════════════════════════════════════════════════════════════════════
+        function buildFlowerSVG(type, S) {
+            switch (type) {
+                case 'gerbera': return makeGerbera(rnd(gerberaPalettes), S);
+                case 'tulip': return makeTulip(rnd(tulipPalettes), S);
+                case 'lotus': return makeLotus(rnd(lotusPalettes), S);
+                case 'orchid': return makeOrchid(rnd(orchidPalettes), S);
+                case 'paeony': return makePaeony(rnd(paeonyPalettes), S);
+                case 'sunflower': return makeSunflower(rnd(sunflowerPalettes), S);
+            }
         }
-        const msg=document.createElement('div'); msg.className='floating-message';
-        msg.textContent=loveMessages[Math.floor(Math.random()*loveMessages.length)];
-        msg.style.left=e.pageX+'px'; msg.style.top=(e.pageY-40)+'px';
-        document.body.appendChild(msg);
-        setTimeout(()=>msg.remove(),3000);
-    });
 
-    // ─── 6. CANVAS: LUCIÉRNAGAS, ABEJITAS, ESTRELLAS FUGACES, MOTITAS ──────
-    const canvas=document.getElementById('particles-canvas');
-    const ctx=canvas.getContext('2d');
-    let creatures=[]; let shootingStarTimeout;
-    function resizeCanvas(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
-    window.addEventListener('resize',resizeCanvas); resizeCanvas();
+        const DAY_FLOWERS = ['sunflower', 'sunflower', 'paeony', 'paeony', 'gerbera', 'gerbera', 'tulip'];
+        const NIGHT_FLOWERS = ['lotus', 'lotus', 'orchid', 'orchid', 'gerbera', 'gerbera', 'tulip'];
 
-    class Firefly {
-        constructor(){ this.reset(true); }
-        reset(init){
-            this.x=Math.random()*canvas.width;
-            this.y=init?canvas.height*0.2+Math.random()*canvas.height*0.7:canvas.height*0.25+Math.random()*canvas.height*0.6;
-            this.size=Math.random()*2.5+1.5;
-            this.speedX=(Math.random()-0.5)*0.5; this.speedY=(Math.random()-0.5)*0.5;
-            this.opacity=Math.random(); this.fadeDir=Math.random()>0.5?1:-1;
-            this.fadeSpeed=Math.random()*0.015+0.005;
-            this.angle=Math.random()*Math.PI*2; this.angleSpeed=(Math.random()-0.5)*0.04;
-            this.trailX=[]; this.trailY=[]; this.hue=Math.random()>0.5?75:55;
+        function spawnFlower(layer, night) {
+            let sz, op, zi, bot;
+            if (layer === 'back') { sz = Math.random() * 0.18 + 0.28; op = 0.55; zi = 7; bot = Math.random() * 14 + 25; }
+            else if (layer === 'mid') { sz = Math.random() * 0.20 + 0.50; op = 0.82; zi = 8; bot = Math.random() * 10 + 14; }
+            else { sz = Math.random() * 0.25 + 0.72; op = 1; zi = 9; bot = Math.random() * 8 + 5; }
+
+            const pool = night ? NIGHT_FLOWERS : DAY_FLOWERS;
+            const type = rnd(pool);
+            const svg = buildFlowerSVG(type, sz);
+            if (!svg) return;
+
+            const w = document.createElement('div');
+            w.className = 'flower-wrapper';
+            w.innerHTML = svg;
+            w.style.left = (Math.random() * 86 + 4) + '%';
+            w.style.bottom = bot + '%';
+            w.style.opacity = op;
+            w.style.zIndex = zi;
+            w.style.setProperty('--delay', (Math.random() * 2.5) + 's');
+            w.style.setProperty('--sway-time', (Math.random() * 3 + 3.5) + 's');
+            w.style.setProperty('--sway-deg', (Math.random() * 6 + 2));
+            if (night) w.style.filter = 'drop-shadow(0 0 7px rgba(200,200,255,0.35))';
+            garden.appendChild(w);
         }
-        update(){
-            this.angle+=this.angleSpeed;
-            this.x+=this.speedX+Math.sin(this.angle)*0.6;
-            this.y+=this.speedY+Math.cos(this.angle*0.7)*0.4;
-            this.opacity+=this.fadeDir*this.fadeSpeed;
-            if(this.opacity>=1){this.opacity=1;this.fadeDir=-1;}
-            if(this.opacity<=0){this.opacity=0;this.fadeDir=1;}
-            this.trailX.unshift(this.x); this.trailY.unshift(this.y);
-            if(this.trailX.length>8){this.trailX.pop();this.trailY.pop();}
-            if(this.x<-20||this.x>canvas.width+20||this.y<-20||this.y>canvas.height+20) this.reset(false);
+
+        function buildGarden(night) {
+            garden.innerHTML = '';
+            for (let i = 0; i < 10; i++) spawnFlower('back', night);
+            for (let i = 0; i < 14; i++) spawnFlower('mid', night);
+            for (let i = 0; i < 10; i++) spawnFlower('front', night);
         }
-        draw(){
-            for(let i=1;i<this.trailX.length;i++){
-                const alpha=(this.opacity*(1-i/this.trailX.length))*0.4;
-                ctx.save(); ctx.globalAlpha=alpha;
-                ctx.fillStyle=`hsl(${this.hue},100%,70%)`;
-                ctx.shadowBlur=8; ctx.shadowColor=`hsl(${this.hue},100%,60%)`;
-                ctx.beginPath(); ctx.arc(this.trailX[i],this.trailY[i],this.size*(1-i/this.trailX.length)*0.8,0,Math.PI*2); ctx.fill();
+        buildGarden(isNightMode);
+
+        // ─── INTERACCIÓN ─────────────────────────────────────────────────────────────
+        const sparkleColors = ['#ffeb3b', '#ff4081', '#4caf50', '#00e5ff', '#ffffff', '#ff9800', '#ce93d8', '#80deea'];
+        const loveMessages = [
+            "Qué hermosa te quiero ❤️", "Eres la mejor 🌹", "Me encantan tus ojos",
+            "Tus ojos brillan más que las estrellas ✨", "Me pierdo en tu mirada",
+            "Tu pelo está increíble 💇‍♀️", "Me encanta tu cabello", "Tu sonrisa me alegra el día",
+            "Me haces muy feliz", "Eres especial para mí", "Contigo todo es mejor",
+            "Qué suerte tenerte", "Me encantas mucho", "Eres luz en mi día 🌸",
+            "Eres mi persona favorita", "Te pienso todo el día",
+            "Eres un sueño hecho realidad", "Eres única y especial",
+            "Contigo todo es mágico", "Eres la mejor compañía 🌺"
+        ];
+        garden.addEventListener('click', (e) => {
+            const flower = e.target.closest('.flower-wrapper');
+            if (!flower) return;
+            flower.classList.remove('touched'); void flower.offsetWidth; flower.classList.add('touched');
+            setTimeout(() => flower.classList.remove('touched'), 500);
+            for (let i = 0; i < 14; i++) {
+                const s = document.createElement('div'); s.className = 'sparkle';
+                s.style.left = e.pageX + 'px'; s.style.top = e.pageY + 'px';
+                s.style.background = sparkleColors[Math.floor(Math.random() * sparkleColors.length)];
+                s.style.setProperty('--tx', (Math.random() - 0.5) * 130 + 'px');
+                s.style.setProperty('--ty', (Math.random() - 0.5) * 130 - 40 + 'px');
+                document.body.appendChild(s); setTimeout(() => s.remove(), 700);
+            }
+            const msg = document.createElement('div'); msg.className = 'floating-message';
+            msg.textContent = loveMessages[Math.floor(Math.random() * loveMessages.length)];
+            msg.style.left = e.pageX + 'px'; msg.style.top = (e.pageY - 40) + 'px';
+            document.body.appendChild(msg); setTimeout(() => msg.remove(), 3000);
+        });
+
+        // ─── CANVAS PARTÍCULAS ───────────────────────────────────────────────────────
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+        let creatures = []; let shootingStarTimeout;
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+        class Firefly {
+            constructor() { this.reset(true); }
+            reset(init) {
+                this.x = Math.random() * canvas.width;
+                this.y = init ? canvas.height * 0.2 + Math.random() * canvas.height * 0.7 : canvas.height * 0.25 + Math.random() * canvas.height * 0.6;
+                this.size = Math.random() * 2.5 + 1.5; this.speedX = (Math.random() - 0.5) * 0.5; this.speedY = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random(); this.fadeDir = Math.random() > 0.5 ? 1 : -1; this.fadeSpeed = Math.random() * 0.015 + 0.005;
+                this.angle = Math.random() * Math.PI * 2; this.angleSpeed = (Math.random() - 0.5) * 0.04;
+                this.trailX = []; this.trailY = []; this.hue = Math.random() > 0.5 ? 75 : 55;
+            }
+            update() {
+                this.angle += this.angleSpeed;
+                this.x += this.speedX + Math.sin(this.angle) * 0.6; this.y += this.speedY + Math.cos(this.angle * 0.7) * 0.4;
+                this.opacity += this.fadeDir * this.fadeSpeed;
+                if (this.opacity >= 1) { this.opacity = 1; this.fadeDir = -1; }
+                if (this.opacity <= 0) { this.opacity = 0; this.fadeDir = 1; }
+                this.trailX.unshift(this.x); this.trailY.unshift(this.y);
+                if (this.trailX.length > 8) { this.trailX.pop(); this.trailY.pop(); }
+                if (this.x < -20 || this.x > canvas.width + 20 || this.y < -20 || this.y > canvas.height + 20) this.reset(false);
+            }
+            draw() {
+                for (let i = 1; i < this.trailX.length; i++) {
+                    const a = (this.opacity * (1 - i / this.trailX.length)) * 0.4;
+                    ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = `hsl(${this.hue},100%,70%)`;
+                    ctx.shadowBlur = 8; ctx.shadowColor = `hsl(${this.hue},100%,60%)`;
+                    ctx.beginPath(); ctx.arc(this.trailX[i], this.trailY[i], this.size * (1 - i / this.trailX.length) * 0.8, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+                }
+                ctx.save(); ctx.globalAlpha = this.opacity;
+                const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 5);
+                g.addColorStop(0, `hsla(${this.hue},100%,75%,0.4)`); g.addColorStop(1, `hsla(${this.hue},100%,75%,0)`);
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(this.x, this.y, this.size * 5, 0, Math.PI * 2); ctx.fill();
+                ctx.shadowBlur = 20; ctx.shadowColor = `hsl(${this.hue},100%,70%)`;
+                ctx.fillStyle = `hsl(${this.hue},100%,90%)`; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+            }
+        }
+
+        class Bee {
+            constructor(i) { this.index = i; this.reset(); }
+            reset() {
+                this.x = -60; this.baseY = canvas.height * 0.25 + Math.random() * canvas.height * 0.5;
+                this.y = this.baseY; this.speedX = Math.random() * 1.8 + 1.2;
+                this.wingAngle = Math.random() * Math.PI * 2; this.bodySize = Math.random() * 3 + 7;
+                this.phase = Math.random() * Math.PI * 2; this.wobble = Math.random() * 30 + 20;
+                this.pathFreq = Math.random() * 0.015 + 0.01; this.delay = this.index * 180;
+            }
+            update() {
+                this.delay = Math.max(0, this.delay - 1); if (this.delay > 0) return;
+                this.x += this.speedX; this.wingAngle += 0.45;
+                this.y = this.baseY + Math.sin(this.x * this.pathFreq + this.phase) * this.wobble;
+                if (this.x > canvas.width + 70) { this.x = -60; this.baseY = canvas.height * 0.25 + Math.random() * canvas.height * 0.5; this.phase = Math.random() * Math.PI * 2; this.speedX = Math.random() * 1.8 + 1.2; }
+            }
+            draw() {
+                if (this.delay > 0) return;
+                const { x, y, bodySize: bs, wingAngle } = this; ctx.save(); ctx.translate(x, y);
+                const wf = Math.abs(Math.sin(wingAngle)), wf2 = Math.abs(Math.sin(wingAngle + 0.8));
+                ctx.fillStyle = 'rgba(210,230,255,0.72)'; ctx.strokeStyle = 'rgba(100,160,220,0.5)'; ctx.lineWidth = 0.8;
+                ctx.beginPath(); ctx.ellipse(-bs * 0.7, -bs * 0.7, bs * 0.9, wf * bs * 1.1, -0.4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.ellipse(bs * 0.7, -bs * 0.7, bs * 0.9, wf2 * bs * 1.1, 0.4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                const bg = ctx.createRadialGradient(-bs * 0.2, -bs * 0.3, 0, 0, 0, bs);
+                bg.addColorStop(0, '#FFE066'); bg.addColorStop(0.5, '#FFB300'); bg.addColorStop(1, '#F57F17');
+                ctx.fillStyle = bg; ctx.beginPath(); ctx.ellipse(0, 0, bs * 0.6, bs, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = 'rgba(20,10,0,0.85)';
+                for (let s = 0; s < 3; s++) { ctx.beginPath(); ctx.ellipse(0, -bs * 0.3 + s * bs * 0.38, bs * 0.5, bs * 0.22, 0, 0, Math.PI * 2); ctx.fill(); }
+                const hg = ctx.createRadialGradient(-bs * 0.15, -bs * 1.2, 0, 0, -bs * 1.1, bs * 0.55);
+                hg.addColorStop(0, '#FFF176'); hg.addColorStop(1, '#F9A825');
+                ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(0, -bs * 1.05, bs * 0.52, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#1a1a1a';
+                ctx.beginPath(); ctx.arc(-bs * 0.22, -bs * 1.12, bs * 0.14, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(bs * 0.22, -bs * 1.12, bs * 0.14, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = '#333'; ctx.lineWidth = 1.2;
+                ctx.beginPath(); ctx.moveTo(-bs * 0.2, -bs * 1.5); ctx.quadraticCurveTo(-bs * 0.8, -bs * 2.3, -bs * 0.6, -bs * 2.6); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(bs * 0.2, -bs * 1.5); ctx.quadraticCurveTo(bs * 0.8, -bs * 2.3, bs * 0.6, -bs * 2.6); ctx.stroke();
+                ctx.fillStyle = '#333';
+                ctx.beginPath(); ctx.arc(-bs * 0.6, -bs * 2.6, bs * 0.15, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(bs * 0.6, -bs * 2.6, bs * 0.15, 0, Math.PI * 2); ctx.fill();
                 ctx.restore();
             }
-            ctx.save(); ctx.globalAlpha=this.opacity;
-            const grad=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.size*5);
-            grad.addColorStop(0,`hsla(${this.hue},100%,75%,0.4)`); grad.addColorStop(1,`hsla(${this.hue},100%,75%,0)`);
-            ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(this.x,this.y,this.size*5,0,Math.PI*2); ctx.fill();
-            ctx.shadowBlur=20; ctx.shadowColor=`hsl(${this.hue},100%,70%)`;
-            ctx.fillStyle=`hsl(${this.hue},100%,90%)`; ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill();
-            ctx.restore();
         }
-    }
 
-    class Bee {
-        constructor(i){ this.index=i; this.reset(); }
-        reset(){
-            this.x=-60; this.baseY=canvas.height*0.25+Math.random()*canvas.height*0.5;
-            this.y=this.baseY; this.speedX=Math.random()*1.8+1.2;
-            this.wingAngle=Math.random()*Math.PI*2; this.bodySize=Math.random()*3+7;
-            this.phase=Math.random()*Math.PI*2; this.wobble=Math.random()*30+20;
-            this.pathFreq=Math.random()*0.015+0.01; this.delay=this.index*180;
+        class ShootingStar {
+            constructor() { this.active = false; }
+            trigger() {
+                this.active = true; this.x = Math.random() * canvas.width * 0.7; this.y = Math.random() * canvas.height * 0.3;
+                this.len = Math.random() * 100 + 60; this.speed = Math.random() * 14 + 10;
+                this.angle = Math.PI / 4 + (Math.random() - 0.5) * 0.3; this.opacity = 1; this.width = Math.random() * 2 + 1;
+            }
+            update() {
+                if (!this.active) return;
+                this.x += Math.cos(this.angle) * this.speed; this.y += Math.sin(this.angle) * this.speed;
+                this.opacity -= 0.018;
+                if (this.opacity <= 0 || this.x > canvas.width || this.y > canvas.height) this.active = false;
+            }
+            draw() {
+                if (!this.active) return;
+                ctx.save(); ctx.globalAlpha = this.opacity;
+                const g = ctx.createLinearGradient(this.x, this.y, this.x - Math.cos(this.angle) * this.len, this.y - Math.sin(this.angle) * this.len);
+                g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.3, 'rgba(200,220,255,0.6)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.strokeStyle = g; ctx.lineWidth = this.width; ctx.shadowBlur = 12; ctx.shadowColor = '#fff';
+                ctx.beginPath(); ctx.moveTo(this.x, this.y); ctx.lineTo(this.x - Math.cos(this.angle) * this.len, this.y - Math.sin(this.angle) * this.len); ctx.stroke(); ctx.restore();
+            }
         }
-        update(){
-            this.delay=Math.max(0,this.delay-1); if(this.delay>0)return;
-            this.x+=this.speedX; this.wingAngle+=0.45;
-            this.y=this.baseY+Math.sin(this.x*this.pathFreq+this.phase)*this.wobble;
-            if(this.x>canvas.width+70){ this.x=-60; this.baseY=canvas.height*0.25+Math.random()*canvas.height*0.5; this.phase=Math.random()*Math.PI*2; this.speedX=Math.random()*1.8+1.2; }
-        }
-        draw(){
-            if(this.delay>0)return;
-            const{x,y,bodySize:bs,wingAngle}=this;
-            ctx.save(); ctx.translate(x,y);
-            const wingFlap=Math.abs(Math.sin(wingAngle));
-            const wingFlap2=Math.abs(Math.sin(wingAngle+0.8));
-            ctx.fillStyle='rgba(210,230,255,0.72)'; ctx.strokeStyle='rgba(100,160,220,0.5)'; ctx.lineWidth=0.8;
-            ctx.beginPath(); ctx.ellipse(-bs*0.7,-bs*0.7,bs*0.9,wingFlap*bs*1.1,-0.4,0,Math.PI*2); ctx.fill(); ctx.stroke();
-            ctx.beginPath(); ctx.ellipse(bs*0.7,-bs*0.7,bs*0.9,wingFlap2*bs*1.1,0.4,0,Math.PI*2); ctx.fill(); ctx.stroke();
-            const bg=ctx.createRadialGradient(-bs*0.2,-bs*0.3,0,0,0,bs);
-            bg.addColorStop(0,'#FFE066'); bg.addColorStop(0.5,'#FFB300'); bg.addColorStop(1,'#F57F17');
-            ctx.fillStyle=bg; ctx.beginPath(); ctx.ellipse(0,0,bs*0.6,bs,0,0,Math.PI*2); ctx.fill();
-            ctx.fillStyle='rgba(20,10,0,0.85)';
-            for(let s=0;s<3;s++){ ctx.beginPath(); ctx.ellipse(0,-bs*0.3+s*bs*0.38,bs*0.5,bs*0.22,0,0,Math.PI*2); ctx.fill(); }
-            const hg=ctx.createRadialGradient(-bs*0.15,-bs*1.2,0,0,-bs*1.1,bs*0.55);
-            hg.addColorStop(0,'#FFF176'); hg.addColorStop(1,'#F9A825');
-            ctx.fillStyle=hg; ctx.beginPath(); ctx.arc(0,-bs*1.05,bs*0.52,0,Math.PI*2); ctx.fill();
-            ctx.fillStyle='#1a1a1a';
-            ctx.beginPath(); ctx.arc(-bs*0.22,-bs*1.12,bs*0.14,0,Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(bs*0.22,-bs*1.12,bs*0.14,0,Math.PI*2); ctx.fill();
-            ctx.strokeStyle='#333'; ctx.lineWidth=1.2;
-            ctx.beginPath(); ctx.moveTo(-bs*0.2,-bs*1.5); ctx.quadraticCurveTo(-bs*0.8,-bs*2.3,-bs*0.6,-bs*2.6); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(bs*0.2,-bs*1.5); ctx.quadraticCurveTo(bs*0.8,-bs*2.3,bs*0.6,-bs*2.6); ctx.stroke();
-            ctx.fillStyle='#333';
-            ctx.beginPath(); ctx.arc(-bs*0.6,-bs*2.6,bs*0.15,0,Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(bs*0.6,-bs*2.6,bs*0.15,0,Math.PI*2); ctx.fill();
-            ctx.restore();
-        }
-    }
 
-    class ShootingStar {
-        constructor(){ this.active=false; }
-        trigger(){
-            this.active=true; this.x=Math.random()*canvas.width*0.7;
-            this.y=Math.random()*canvas.height*0.3; this.len=Math.random()*100+60;
-            this.speed=Math.random()*14+10; this.angle=Math.PI/4+(Math.random()-0.5)*0.3;
-            this.opacity=1; this.width=Math.random()*2+1;
+        class SunMote {
+            constructor() { this.reset(true); }
+            reset(init) {
+                this.x = Math.random() * canvas.width; this.y = init ? Math.random() * canvas.height * 0.8 : canvas.height * 0.8;
+                this.size = Math.random() * 2 + 0.8; this.speedY = -(Math.random() * 0.35 + 0.1);
+                this.speedX = (Math.random() - 0.5) * 0.25; this.opacity = Math.random() * 0.55 + 0.15;
+                this.wobbleAmp = Math.random() * 0.3; this.wobbleFreq = Math.random() * 0.02 + 0.01; this.phase = Math.random() * Math.PI * 2;
+            }
+            update() { this.y += this.speedY; this.x += this.speedX + Math.sin(this.y * this.wobbleFreq + this.phase) * this.wobbleAmp; if (this.y < -10) this.reset(false); }
+            draw() {
+                ctx.save(); ctx.globalAlpha = this.opacity;
+                const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 3);
+                g.addColorStop(0, 'rgba(255,253,200,1)'); g.addColorStop(0.5, 'rgba(255,245,150,0.5)'); g.addColorStop(1, 'rgba(255,245,150,0)');
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = 'rgba(255,255,240,0.9)'; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+            }
         }
-        update(){
-            if(!this.active)return;
-            this.x+=Math.cos(this.angle)*this.speed; this.y+=Math.sin(this.angle)*this.speed;
-            this.opacity-=0.018;
-            if(this.opacity<=0||this.x>canvas.width||this.y>canvas.height) this.active=false;
-        }
-        draw(){
-            if(!this.active)return;
-            ctx.save(); ctx.globalAlpha=this.opacity;
-            const grad=ctx.createLinearGradient(this.x,this.y,this.x-Math.cos(this.angle)*this.len,this.y-Math.sin(this.angle)*this.len);
-            grad.addColorStop(0,'rgba(255,255,255,1)'); grad.addColorStop(0.3,'rgba(200,220,255,0.6)'); grad.addColorStop(1,'rgba(255,255,255,0)');
-            ctx.strokeStyle=grad; ctx.lineWidth=this.width; ctx.shadowBlur=12; ctx.shadowColor='#ffffff';
-            ctx.beginPath(); ctx.moveTo(this.x,this.y); ctx.lineTo(this.x-Math.cos(this.angle)*this.len,this.y-Math.sin(this.angle)*this.len); ctx.stroke();
-            ctx.restore();
-        }
-    }
 
-    class SunMote {
-        constructor(){ this.reset(true); }
-        reset(init){
-            this.x=Math.random()*canvas.width;
-            this.y=init?Math.random()*canvas.height*0.8:canvas.height*0.8;
-            this.size=Math.random()*2+0.8; this.speedY=-(Math.random()*0.35+0.1);
-            this.speedX=(Math.random()-0.5)*0.25; this.opacity=Math.random()*0.55+0.15;
-            this.wobbleAmp=Math.random()*0.3; this.wobbleFreq=Math.random()*0.02+0.01;
-            this.phase=Math.random()*Math.PI*2;
+        const shootingStars = [new ShootingStar(), new ShootingStar(), new ShootingStar()];
+        function triggerShootingStar() {
+            if (!isNightMode) return;
+            const a = shootingStars.find(s => !s.active); if (a) a.trigger();
+            shootingStarTimeout = setTimeout(triggerShootingStar, Math.random() * 5000 + 2500);
         }
-        update(){
-            this.y+=this.speedY;
-            this.x+=this.speedX+Math.sin(this.y*this.wobbleFreq+this.phase)*this.wobbleAmp;
-            if(this.y<-10) this.reset(false);
+        function initCreatures() {
+            creatures = []; clearTimeout(shootingStarTimeout);
+            if (isNightMode) {
+                for (let i = 0; i < 30; i++) creatures.push(new Firefly());
+                triggerShootingStar(); shootingStars.forEach(s => s.active = false);
+            } else {
+                for (let i = 0; i < 7; i++) creatures.push(new Bee(i));
+                for (let i = 0; i < 35; i++) creatures.push(new SunMote());
+                shootingStars.forEach(s => s.active = false);
+            }
         }
-        draw(){
-            ctx.save(); ctx.globalAlpha=this.opacity;
-            const grad=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.size*3);
-            grad.addColorStop(0,'rgba(255,253,200,1)'); grad.addColorStop(0.5,'rgba(255,245,150,0.5)'); grad.addColorStop(1,'rgba(255,245,150,0)');
-            ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(this.x,this.y,this.size*3,0,Math.PI*2); ctx.fill();
-            ctx.fillStyle='rgba(255,255,240,0.9)'; ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fill();
-            ctx.restore();
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            creatures.forEach(c => { c.update(); c.draw(); });
+            shootingStars.forEach(s => { s.update(); s.draw(); });
+            requestAnimationFrame(animateCanvas);
         }
-    }
+        initCreatures(); animateCanvas();
 
-    const shootingStars=[new ShootingStar(),new ShootingStar(),new ShootingStar()];
-    function triggerShootingStar(){
-        if(!isNightMode)return;
-        const a=shootingStars.find(s=>!s.active); if(a) a.trigger();
-        shootingStarTimeout=setTimeout(triggerShootingStar,Math.random()*5000+2500);
-    }
-    function initCreatures(){
-        creatures=[]; clearTimeout(shootingStarTimeout);
-        if(isNightMode){
-            for(let i=0;i<30;i++) creatures.push(new Firefly());
-            triggerShootingStar(); shootingStars.forEach(s=>s.active=false);
-        } else {
-            for(let i=0;i<7;i++) creatures.push(new Bee(i));
-            for(let i=0;i<35;i++) creatures.push(new SunMote());
-            shootingStars.forEach(s=>s.active=false);
-        }
-    }
-    function animateCanvas(){
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        creatures.forEach(c=>{c.update();c.draw();});
-        shootingStars.forEach(s=>{s.update();s.draw();});
-        requestAnimationFrame(animateCanvas);
-    }
-    initCreatures(); animateCanvas();
-
-    // ─── 7. ACTUALIZACIÓN PERIÓDICA ─────────────────────────────────────────
-    setInterval(()=>{
-        const wasNight=isNightMode; isNightMode=setTheme();
-        if(wasNight!==isNightMode){
-            initCreatures(); updateDynamicTitle();
-            document.querySelectorAll('.flower-wrapper').forEach(fw=>{
-                fw.style.filter=isNightMode?'drop-shadow(0 0 5px rgba(200,200,255,0.28))':'';
-            });
-        }
-    },60000);
+        // ─── ACTUALIZACIÓN PERIÓDICA ─────────────────────────────────────────────────
+        setInterval(() => {
+            const wasNight = isNightMode; isNightMode = setTheme();
+            if (wasNight !== isNightMode) {
+                buildGarden(isNightMode);
+                initCreatures();
+                updateDynamicTitle();
+            }
+        }, 60000);
     </script>
 </body>
+
 </html>
